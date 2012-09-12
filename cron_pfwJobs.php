@@ -5,8 +5,8 @@
  * Version-1: 2012-08-29. Alex Casaus
  * Version-2: 2012-08-30. Alex Casaus
  * Version-3: 2012-08-31. Alex Casaus
- * Version-4: 2012-09-05.  Alejandro PÃ©rez
- * Version-5: 2012-09-06.  Alejandro PÃ©rez
+ * Version-4: 2012-09-05.  Alejandro Pérez
+ * Version-5: 2012-09-06.  Alejandro Pérez
  * Puesta en Marcha: ????
  */
 include("mysql.php");
