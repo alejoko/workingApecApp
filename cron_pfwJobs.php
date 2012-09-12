@@ -5,8 +5,8 @@
  * Version-1: 2012-08-29. Alex Casaus
  * Version-2: 2012-08-30. Alex Casaus
  * Version-3: 2012-08-31. Alex Casaus
- * Version-4: 2012-09-05.  Alejandro Pérez
- * Version-5: 2012-09-06.  Alejandro Pérez
+ * Version-4: 2012-09-05.  Alejandro PÃ©rez
+ * Version-5: 2012-09-06.  Alejandro PÃ©rez
  * Puesta en Marcha: ????
  */
 include("mysql.php");
@@ -21,12 +21,17 @@ class composeXml{
                 private $partnerId;
                 private $userId;
                 private $password;
+                private $inidate;
+                private $enddate;
                 
-                public function __construct($partner,$user,$pwd){
+                public function __construct($partner,$user,$pwd,$idate,$edate){
 			       $this->partnerId = $partner;
 			       $this->userId = $user;
 			       $this->password = $pwd;
-                               $this->db_query = new mySQL();
+			       $this->inidate = $idate;
+			       $this->enddate = $edate;
+                   
+			       $this->db_query = new mySQL();
 			    } 
                 
                     
@@ -35,9 +40,9 @@ class composeXml{
                         // DATA for build authentication element
                         $md5 = md5("id1=$this->userId&id2=$this->partnerId&pass=".$this->password."eRecrutement");
                         
-                        //Instancia a la clase de conexión y de queries
+                        //Instancia a la clase de conexiÃ³n y de queries
                        	
-                        //Obtenemos el día de hoy (desde las 00:00:00 a las 23:59:59
+                        //Obtenemos el dÃ­a de hoy (desde las 00:00:00 a las 23:59:59
                         $first_today = date("Y-m-d 00:00:00");
                         $last_today = date("Y-m-d 23:59:59");
                         //Preparamos el contenido del SELECT
@@ -70,10 +75,10 @@ class composeXml{
                         $join .= " LEFT JOIN pfw_5_jobdomain AS domain ON job.job_domain = domain.pfwid";
                         $join .= " LEFT JOIN pfw_5_jobarea AS area ON job.job_area = area.pfwid";
                         //Preparamos el contenido del WHERE de nuestra consulta
-                        //$where = " WHERE aux.aux_job_datetime BETWEEN '".$first_today."' AND '".$last_today."'";
                         $where = " WHERE 1";
                         $where .= " AND aux.aux_job_flag_make = 0";
                         $where .= " AND DATE(job.job_expirationdate) >= DATE( NOW() )";
+                        $where .= " AND DATE(aux.aux_job_datetime) BETWEEN '".$inidate."' AND '".$enddate."'";
 
                         echo $select.$join.$where."\n";
                         //Lanzamos la consulta sobre jobs (join con la tabla de apoyo)
@@ -84,7 +89,7 @@ class composeXml{
 
                         while($result = $this->db_query->fetch_array($query)) {
                            echo "<br/>mysql fetch_array<br/>";
-                          //Mapeamos la experiencia, el sueldo mínimo y el sueldo máximo dependiendo de la job_experience
+                          //Mapeamos la experiencia, el sueldo mÃ­nimo y el sueldo mÃ¡ximo dependiendo de la job_experience
 
                            $timeStamp = strtotime(date('Y-m-d H:i:s'));
                            $randTimeStamp = rand(0,$timeStamp);
@@ -98,7 +103,7 @@ class composeXml{
                           // validate some fields first
                           $job_remuneration = substr($result['job_remuneration'], 0, 29);
                           if(trim($result['job_remuneration'])==""){
-                                 $job_remuneration  = "à négocier";    
+                                 $job_remuneration  = "Ã  nÃ©gocier";    
                           }
                            
                         switch ($result['job_experience']){
@@ -352,7 +357,7 @@ class composeXml{
                 
                 public function deleteExpiredOffers(){
                       
-                        //Instancia a la clase de conexión y de queries
+                        //Instancia a la clase de conexiÃ³n y de queries
                         $this->db_query = new mySQL();	
                         
                          //Preparamos el contenido del SELECT
