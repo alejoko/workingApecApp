@@ -9,7 +9,7 @@
 //TODO: create table
 //DROP TABLE `aux_pfw_job`;
 //CREATE TABLE `aux_pfw_job` (
-//	`aux_pfw_id` INT(11) NOT NULL AUTO_INCREMENT,
+//    `aux_pfw_id` INT(11) NOT NULL AUTO_INCREMENT,
 //	`aux_job_id` INT(11) NOT NULL,
 //	`aux_job_datetime` DATETIME NOT NULL,
 //	`aux_job_flag_make` TINYINT(1) NOT NULL DEFAULT '0',
@@ -59,7 +59,7 @@
     
     require_once "config.php";
     require_once "mailClass.php";
-    require_once "cron_pfwJobs.php";
+    require_once "pfwJobs.php";
     require_once "SOAP/Client.php";
     require_once "MySoapClient.php";
     require_once "XmlUtils.php";
@@ -75,13 +75,24 @@
      $message = "test mail"; 
      $mail = new mailClass( "info@concatel.com" , MAIL_AUTH, $subject, $message);
      $mail->send();
-                    
-    $composition = new composeXml(
+
+    if(!isset($_SERVER['argv'][1]) && !isset($_SERVER['argv'][2])){
+    	$composition = new composeXml(
                     PARTNERID,
                     USERID,
-                    PASSWORD
+                    PASSWORD,
+                    INIDATE,
+                    ENDDATE
                 ); 
-
+    }else{ 
+    	$composition = new composeXml(
+                    PARTNERID,
+                    USERID,
+                    PASSWORD,
+                    $_SERVER['argv'][1],
+                    $_SERVER['argv'][2]
+                ); 
+    }
     //FIRST JOB OF ALL: we program the delete tasks of today!!
     $composition->deleteExpiredOffers();
     
