@@ -67,7 +67,8 @@
     
     error_reporting(E_ALL);
     set_time_limit(600);    
-
+    header('Content-Type: text/html; charset=iso-8859-1');
+    
     // Passing the constant (see config.php) value
     $endpoint = ENDPOINT;
     
