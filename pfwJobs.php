@@ -78,7 +78,7 @@ class composeXml{
                         $where = " WHERE 1";
                         $where .= " AND aux.aux_job_flag_make = 0";
                         $where .= " AND DATE(job.job_expirationdate) >= DATE( NOW() )";
-                        $where .= " AND DATE(aux.aux_job_datetime) BETWEEN '".$inidate."' AND '".$enddate."'";
+                        $where .= " AND DATE(aux.aux_job_datetime) BETWEEN '".$this->inidate."' AND '".$this->enddate."'";
 
                         echo $select.$join.$where."\n";
                         //Lanzamos la consulta sobre jobs (join con la tabla de apoyo)

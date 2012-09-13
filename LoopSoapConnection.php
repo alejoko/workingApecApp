@@ -62,7 +62,7 @@ class LoopSoapConnection{
                              "idApec"       =>   '0',
                              "SOAPOK"       =>   0,
                              "APECOK"       =>   0,
-                             "errorCode"    =>   'Impoible launch SOAP WSDL',
+                             "errorCode"    =>   'Imposible launch SOAP WSDL',
                              "errorString"  =>   $e->getMessage(),
                              "method"       =>   ''
                     );
