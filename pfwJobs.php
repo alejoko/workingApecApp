@@ -91,7 +91,7 @@ class composeXml{
                         
                           $job_remuneration = substr($result['job_remuneration'], 0, 29);
                           if(trim($result['job_remuneration'])==""){
-                                 $job_remuneration  = "Ã  nÃ©gocier";    
+                                 $job_remuneration  = "Ã  nÃ©gocier";    
                           }
                            
                           switch ($result['job_experience']){
@@ -426,7 +426,7 @@ class composeXml{
                 }
                 
                public   function toISO($cadena){ 
-                //convierte de UTF-8 a ISO-8859-1 
+                  //It converts from UTF-8 to ISO-8859-1 
                   $cadena = mb_convert_encoding($cadena, "ISO-8859-1", "UTF-8"); 
                   return $cadena; 
                 } 
