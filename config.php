@@ -4,7 +4,7 @@
     define('MAIL_AUTH',      'alejandro.perez@concatel.com');
     
     define('DB_HOSTNAME',    'srv106.concatel.com');
-    define('DB_USERNAME',      'siiuser');
+    define('DB_USERNAME',    'siiuser');
     define('DB_PASSWORD',    'user00');        
     define('DB_DATABASE',    'pfwecm');
     

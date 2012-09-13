@@ -43,6 +43,7 @@ class composeXml{
                                                                         'job.pfwid',
                                                                         'job_ref', 
                                                                         'DATE(job_expirationdate) AS job_expirationDateFormat',
+                                                                        'job_profile',
                                                                         'job_expirationdate',
                                                                         'job_title', 
                                                                         'job_description',
@@ -166,7 +167,7 @@ class composeXml{
                                   break;
                                   
                           }
-
+ 
                           switch($XMLBodyType){
                           	
                               case "A":
@@ -222,7 +223,7 @@ class composeXml{
                                                                                               <ns3:PositionClassification>Direct Hire</ns3:PositionClassification>
                                                                                               <ns3:Competency name="GLOBAL_EXPERIENCE_LEVEL">
                                                                                                       <ns3:CompetencyEvidence>
-                                                                                                              <ns3:StringValue>'.utf8_decode($job_experience).'</ns3:StringValue>
+                                                                                                              <ns3:StringValue>best employer we can. </ns3:StringValue>
                                                                                                       </ns3:CompetencyEvidence>
                                                                                               </ns3:Competency>
                                                                                               <ns3:RemunerationPackage>
