@@ -16,7 +16,7 @@
     
     define( 'ENDPOINT',      'http://testadepsep.apec.fr/tools?wsdl');
     define( 'WSDL_METHODS',  'http://testadepsep.apec.fr/positions?wsdl');
-    define( 'ENCODING',      'UTF-8');
+    define( 'ENCODING',      'iso-8859-1');
     
     define('SOAP_CONNNECTION_ATTEMPS',6);
     define('SECONDS_BETWEEN_ATTEMPS',4);
