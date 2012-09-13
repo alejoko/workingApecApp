@@ -380,17 +380,17 @@ class composeXml{
                         $arrData["APECStatus"] = "";
                          
                         $tracking_id    = $arrData["tracking_id"];
-                        $request        = mysql_real_escape_string($arrData["request"]);
-                        $response       = mysql_real_escape_string($arrData["response"]);
+                        $request        = mysql_real_escape_string($this->toISO($arrData["request"]));
+                        $response       = mysql_real_escape_string($this->toISO($arrData["response"]));
                         $daemonTaskId   = $arrData["daemonTaskId"];
                         $idSii          = $arrData["idSii"];
                         $idApec         = $arrData["idApec"];
                         $SOAPOK         = $arrData["SOAPOK"];
                         $APECOK         = $arrData["APECOK"];
                         $errorCode      = $arrData["errorCode"];    
-                        $errorString    = mysql_real_escape_string($arrData["errorString"]);       
-                        $APECStatus     = mysql_real_escape_string($arrData["APECStatus"]);       //uso futuro
-                        $method         = mysql_real_escape_string($arrData["method"]);
+                        $errorString    = mysql_real_escape_string($this->toISO($arrData["errorString"]));       
+                        $APECStatus     = mysql_real_escape_string($this->toISO($arrData["APECStatus"]));       //uso futuro
+                        $method         = mysql_real_escape_string($this->toISO($arrData["method"]));
                         
                        echo  $sql = " INSERT INTO pfw_5_webservice_log 
                         (`pfw_wslog_tracking_id` ,
@@ -424,5 +424,11 @@ class composeXml{
                        
                         $this->db_query->query($sql);
                 }
+                
+               public   function toISO($cadena){ 
+                //convierte de UTF-8 a ISO-8859-1 
+                  $cadena = mb_convert_encoding($cadena, "ISO-8859-1", "UTF-8"); 
+                  return $cadena; 
+                } 
 }
 ?> 

@@ -11,8 +11,8 @@
     define( 'PARTNERID',     '277');
     define( 'USERID',        'AGOUETTA@sii.fr');
     define( 'PASSWORD',      'GOUETTA');
-    define( 'INIDATE',       date("d/m/y 00:00:00"));
-    define( 'ENDDATE',       date("d/m/y 23:59:59"));
+    define( 'INIDATE',       date("Y-m-d 00:00:00"));
+    define( 'ENDDATE',       date("Y-m-d 23:59:59"));
     
     define( 'ENDPOINT',      'http://testadepsep.apec.fr/tools?wsdl');
     define( 'WSDL_METHODS',  'http://testadepsep.apec.fr/positions?wsdl');

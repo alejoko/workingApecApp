@@ -52,7 +52,7 @@
 //	INDEX `pfw_wslog_id_jobSii` (`pfw_wslog_id_jobSii`)
 //)
 //COMMENT='pfw_wslog_tracking_id'
-//COLLATE='utf8_general_ci'
+//COLLATE='latin1_swedish_ci'
 //ENGINE=InnoDB;
 
 //TODO:  make a insert value by default for field job_active.
