@@ -10,8 +10,8 @@
     
     // Defined TEST values. These values must change in PROD
     define( 'PARTNERID', '277');
-    define( 'USERID', 'AGOUETTA@sii.fr');
-    define( 'PASSWORD', 'GOUETTA');
+    define( 'USERID',    'AGOUETTA@sii.fr');
+    define( 'PASSWORD',  'GOUETTA');
     
     // Defined default dates (date initial and date end)
     define( 'INIDATE', date("Y-m-d 00:00:00"));

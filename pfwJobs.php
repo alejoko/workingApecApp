@@ -223,7 +223,7 @@ class composeXml{
                                                                                               <ns3:PositionClassification>Direct Hire</ns3:PositionClassification>
                                                                                               <ns3:Competency name="GLOBAL_EXPERIENCE_LEVEL">
                                                                                                       <ns3:CompetencyEvidence>
-                                                                                                              <ns3:StringValue>best employer we can. </ns3:StringValue>
+                                                                                                              <ns3:StringValue>'.$job_experience.'</ns3:StringValue>
                                                                                                       </ns3:CompetencyEvidence>
                                                                                               </ns3:Competency>
                                                                                               <ns3:RemunerationPackage>
