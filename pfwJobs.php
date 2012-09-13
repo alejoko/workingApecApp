@@ -1,13 +1,8 @@
 <?php 
 /*
- * Cron que se lanza diariamente para tratar las ofertas del grupo SII en el sistema APEC (Francia)
- * Creación : 2012-08-28. Alex Casaus y Alejandro Perez
- * Version-1: 2012-08-29. Alex Casaus
- * Version-2: 2012-08-30. Alex Casaus
- * Version-3: 2012-08-31. Alex Casaus
- * Version-4: 2012-09-05.  Alejandro Pérez
- * Version-5: 2012-09-06.  Alejandro Pérez
- * Puesta en Marcha: ????
+ * Cron launched daily to treat SII group's offers in the APEC (France)
+ * Created     : 2012-08-28 by Alejandro Perez & Alex Casaus 
+ * Last Version: 2012-09-06 by Alejandro Pérez
  */
 include("mysql.php");
 
@@ -39,13 +34,8 @@ class composeXml{
 
                         // DATA for build authentication element
                         $md5 = md5("id1=$this->userId&id2=$this->partnerId&pass=".$this->password."eRecrutement");
-                        
-                        //Instancia a la clase de conexiÃ³n y de queries
-                       	
-                        //Obtenemos el dÃ­a de hoy (desde las 00:00:00 a las 23:59:59
-                        $first_today = date("Y-m-d 00:00:00");
-                        $last_today = date("Y-m-d 23:59:59");
-                        //Preparamos el contenido del SELECT
+
+                        //SELECT Content
                         $select = "SELECT ";
                         $required_date_select = array (                 
                                                                         'aux.aux_pfw_id as daemonJobId',
@@ -70,27 +60,26 @@ class composeXml{
                                         $select .= $required_date_select[$i].',';
                                 }
                         }
-                        //Preparamos el contenido del LEFT JOIN
+                        //LEFT JOIN Content
                         $join = " LEFT JOIN pfw_5_job AS job ON aux.aux_job_id = job.pfwid";
                         $join .= " LEFT JOIN pfw_5_jobdomain AS domain ON job.job_domain = domain.pfwid";
                         $join .= " LEFT JOIN pfw_5_jobarea AS area ON job.job_area = area.pfwid";
-                        //Preparamos el contenido del WHERE de nuestra consulta
+                        //WHERE Content
                         $where = " WHERE 1";
                         $where .= " AND aux.aux_job_flag_make = 0";
                         $where .= " AND DATE(job.job_expirationdate) >= DATE( NOW() )";
-//                        $where .= " AND DATE(aux.aux_job_datetime) BETWEEN '".$this->inidate."' AND '".$this->enddate."'";
+						//$where .= " AND DATE(aux.aux_job_datetime) BETWEEN '".$this->inidate."' AND '".$this->enddate."'";
 
                         echo $select.$join.$where."\n";
-                        //Lanzamos la consulta sobre jobs (join con la tabla de apoyo)
                         $query = $this->db_query->getDataJob($select, $join, $where);  
-                        //Montamos el XML
+                        
+                        //XML Building
                         $requestXML = array();
 
 
                         while($result = $this->db_query->fetch_array($query)) {
+                           
                            echo "<br/>mysql fetch_array<br/>";
-                          //Mapeamos la experiencia, el sueldo mÃ­nimo y el sueldo mÃ¡ximo dependiendo de la job_experience
-
                            $timeStamp = strtotime(date('Y-m-d H:i:s'));
                            $randTimeStamp = rand(0,$timeStamp);
                            $idTransaction = $randTimeStamp.$timeStamp.$this->partnerId;
@@ -100,35 +89,38 @@ class composeXml{
                            $this->pushDaemonJobId($result['daemonJobId']);
                            $this->pushIdOfferSii($result['pfwid']);
                         
-                          // validate some fields first
                           $job_remuneration = substr($result['job_remuneration'], 0, 29);
                           if(trim($result['job_remuneration'])==""){
                                  $job_remuneration  = "Ã  nÃ©gocier";    
                           }
                            
-                        switch ($result['job_experience']){
+                          switch ($result['job_experience']){
+                          	
                                 case 3: // 0 - 2 Years
                                         $job_experience = 1;
                                         $basepay_min = 0;
                                         $basepay_max = 1000;
                                 break;
-                                case 1: //experiencia 1
-                                case 2: //experiencia 2
-                                case 6: //Indifferent
+                                
+                                case 1: // Indifferent
+                                case 2: // Indifferent
+                                case 6: // Indifferent
                                         $job_experience = 2;
                                         $basepay_min = 1000;
                                         $basepay_max = 2000;
                                 break;
-                                case 4: //2 - 5 Years
-                                case 5: //Indifferent
+                                
+                                case 4: // 2 - 5 Years
+                                case 5: // > 5 Years
                                         $job_experience = 3;
                                         $basepay_min = 2000;
                                         $basepay_max = 3000;
                                 break;
+                                
                           }
-                         
                         
                           switch($result['operation']){
+                          	
                               case "insert":
                                   $requestType = "openPositionRequest";
                                   $XMLBodyType = "A";
@@ -137,6 +129,7 @@ class composeXml{
                                   $timeStamp = str_replace("-", "", date("y-m-d") );
                                   $idAPEC = $result['pfwid']."/".$timeStamp;
                                   break;
+                                  
                               case "update":
                                   $requestType = "updatePositionRequest";
                                   $XMLBodyType = "A";
@@ -144,6 +137,7 @@ class composeXml{
                                   // read the id for apec SYS
                                   $idAPEC = $this->getApecOfferId($result['pfwid']);
                                   break;
+                                  
                               case "delete":
                                   $requestType = "updatePositionStatusRequest";
                                   $XMLBodyType = "B";
@@ -152,6 +146,7 @@ class composeXml{
                                   // read the id for apec SYS
                                   $idAPEC = $this->getApecOfferId($result['pfwid']);
                                   break;
+                                  
                               case "suspend":
                                   $requestType = "updatePositionStatusRequest";
                                   $XMLBodyType = "B";
@@ -160,6 +155,7 @@ class composeXml{
                                   // read the id for apec SYS
                                   $idAPEC = $this->getApecOfferId($result['pfwid']);
                                   break;
+                                  
                               case "publish":
                                   $requestType = "updatePositionStatusRequest";
                                   $XMLBodyType = "B";
@@ -168,9 +164,11 @@ class composeXml{
                                   // read the id for apec SYS
                                   $idAPEC = $this->getApecOfferId($result['pfwid']);
                                   break;
+                                  
                           }
 
                           switch($XMLBodyType){
+                          	
                               case "A":
                                                 $requestXML[] ='
                                                     <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
@@ -211,7 +209,7 @@ class composeXml{
                                                                                               <ns3:PhysicalLocation>
                                                                                                       <ns3:Name>LOCATION_NAME</ns3:Name>
                                                                                                       <ns3:Area>
-                                                                                                              <ns3:Value>'.$result['jobarea_location'].'</ns3:Value>
+                                                                                                              <ns3:Value>'.utf8_encode($result['jobarea_location']).'</ns3:Value>
                                                                                                       </ns3:Area>
                                                                                               </ns3:PhysicalLocation>
                                                                                               <ns3:PhysicalLocation>
@@ -220,11 +218,11 @@ class composeXml{
                                                                                                       <ns3:Value>ES</ns3:Value>
                                                                                                   </ns3:Area>
                                                                                               </ns3:PhysicalLocation> 
-                                                                                              <ns3:PositionTitle>'.$result['job_title'].'</ns3:PositionTitle>
+                                                                                              <ns3:PositionTitle>'.utf8_encode($result['job_title']).'</ns3:PositionTitle>
                                                                                               <ns3:PositionClassification>Direct Hire</ns3:PositionClassification>
                                                                                               <ns3:Competency name="GLOBAL_EXPERIENCE_LEVEL">
                                                                                                       <ns3:CompetencyEvidence>
-                                                                                                              <ns3:StringValue>'.$job_experience.'</ns3:StringValue>
+                                                                                                              <ns3:StringValue>'.utf8_encode($job_experience).'</ns3:StringValue>
                                                                                                       </ns3:CompetencyEvidence>
                                                                                               </ns3:Competency>
                                                                                               <ns3:RemunerationPackage>
@@ -233,7 +231,7 @@ class composeXml{
                                                                                                               <ns3:BasePayAmountMax>'.$basepay_max.'</ns3:BasePayAmountMax>
                                                                                                       </ns3:BasePay>
                                                                                                       <ns3:OtherPay>
-                                                                                                              <ns3:OtherPayCalculation>'.$job_remuneration.'</ns3:OtherPayCalculation>
+                                                                                                              <ns3:OtherPayCalculation>'.utf8_encode($job_remuneration).'</ns3:OtherPayCalculation>
                                                                                                       </ns3:OtherPay>
                                                                                               </ns3:RemunerationPackage>
                                                                                       </ns3:PositionDetail>
@@ -243,20 +241,21 @@ class composeXml{
                                                                                       </ns3:FormattedPositionDescription>
                                                                                       <ns3:FormattedPositionDescription>
                                                                                               <ns3:Name>POSITION_DESCRIPTION</ns3:Name>
-                                                                                              <ns3:Value>'.strip_tags($result['job_description']).'</ns3:Value>
+                                                                                              <ns3:Value>'.utf8_encode(strip_tags($result['job_description'])).'</ns3:Value>
                                                                                       </ns3:FormattedPositionDescription>
                                                                                       <ns3:FormattedPositionDescription>
                                                                                               <ns3:Name>POSITION_DISPLAY_LOGO</ns3:Name>
                                                                                               <ns3:Value>false</ns3:Value>
                                                                                       </ns3:FormattedPositionDescription>
                                                                               </ns3:PositionProfile>
-                                                                              <ns3:NumberToFill>'.$result['job_vacancy'].'</ns3:NumberToFill>
+                                                                              <ns3:NumberToFill>'.utf8_encode($result['job_vacancy']).'</ns3:NumberToFill>
                                                                       </ns2:position>
                                                                  </ns2:'.$requestType.'>
                                                           </S:Body>
                                                        </S:Envelope> ';	
 
-                                  break;
+                              break;
+                              
                               case "B":
                                         $requestXML[] ='
                                                    <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
@@ -285,7 +284,8 @@ class composeXml{
                                                         </S:Body>
                                                     </S:Envelope>
                                         ';
-                                  break;
+                              break;
+                              
                           }
                         }
 
@@ -339,7 +339,6 @@ class composeXml{
                     return $dataset["aux_apec_id"];
                 }
                 
-                // $idOfferSii =  $this->getSiiOfferId($idApec);
                 public function setWorkOk($TableAuxJobId){ 
                     $sql = "UPDATE aux_pfw_job SET aux_job_flag_make=1 WHERE aux_pfw_id='".$TableAuxJobId."'";
                     $this->db_query->query($sql);
@@ -357,10 +356,8 @@ class composeXml{
                 
                 public function deleteExpiredOffers(){
                       
-                        //Instancia a la clase de conexiÃ³n y de queries
                         $this->db_query = new mySQL();	
                         
-                         //Preparamos el contenido del SELECT
                         $select =" SELECT pfwid as id FROM pfw_5_job ";
                         $join = "";
                         $where = " WHERE 1";
@@ -377,8 +374,6 @@ class composeXml{
                             $this->db_query->query($sql);
                         }
                 }
-                
-               
                 
                 public function log($arrData){
                         
