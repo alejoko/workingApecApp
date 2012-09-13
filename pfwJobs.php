@@ -92,7 +92,7 @@ class composeXml{
                         
                           $job_remuneration = substr($result['job_remuneration'], 0, 29);
                           if(trim($result['job_remuneration'])==""){
-                                 $job_remuneration  = "Depending on apply";    
+                                 $job_remuneration  = "variable";    
                           }
                            
                           switch ($result['job_experience']){
