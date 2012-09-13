@@ -10,7 +10,7 @@
 //DROP TABLE `aux_pfw_job`;
 //CREATE TABLE `aux_pfw_job` (
 //    `aux_pfw_id` INT(11) NOT NULL AUTO_INCREMENT,
-//	`aux_job_id` INT(11) NOT NULL,
+//    `aux_job_id` INT(11) NOT NULL,
 //	`aux_job_datetime` DATETIME NOT NULL,
 //	`aux_job_flag_make` TINYINT(1) NOT NULL DEFAULT '0',
 //	`aux_job_operation` MEDIUMTEXT NOT NULL,
@@ -66,16 +66,13 @@
     require_once "LoopSoapConnection.php";
     
     error_reporting(E_ALL);
-    set_time_limit(600);    
+    set_time_limit(600);
+    $endpoint = ENDPOINT;    
     header('Content-Type: text/html; charset=iso-8859-1');
-    
-    // Passing the constant (see config.php) value
-    $endpoint = ENDPOINT;
-    
-     $subject = "APEC SOAP PROCESS IS LAUNCHED";
-     $message = "test mail"; 
-     $mail = new mailClass( "info@concatel.com" , MAIL_AUTH, $subject, $message);
-     $mail->send();
+    $subject = "APEC SOAP PROCESS IS LAUNCHED";
+    $message = "test mail"; 
+    $mail = new mailClass( "info@concatel.com" , MAIL_AUTH, $subject, $message);
+    $mail->send();
 
     if(!isset($_SERVER['argv'][1]) && !isset($_SERVER['argv'][2])){
     	$composition = new composeXml(
@@ -94,14 +91,14 @@
                     $_SERVER['argv'][2]
                 ); 
     }
-    //FIRST JOB OF ALL: we program the delete tasks of today!!
+    // Delete tasks of today!!
     $composition->deleteExpiredOffers();
-    
-    // get array of data and methods
+    // Get array of data and methods
     $dataXml =  $composition->getData();
-    $method =   $composition->getMethod();
+    $method  =  $composition->getMethod();
+    // Get Daemon Job Id and Offer Id (Sii system)
     $daemonJobId = $composition->getDaemonJobId();
-    $idOfferSii = $composition->getIdOfferSii();
+    $idOfferSii  = $composition->getIdOfferSii();
     
     $loop = new LoopSoapConnection();
     $soapClient = $loop->attemptsInLoopSoapConn($endpoint);
@@ -153,7 +150,7 @@
                   
        } else {
            
-           // log results:
+           // Log Results
            $arrData = array(
                     "tracking_id"  =>   $parseXml->trackingId,
                     "request"      =>   $strXml,
@@ -173,5 +170,4 @@
        
     }
   
-        
 ?>
