@@ -111,17 +111,36 @@
         die();
     }
     
-//  process that gives status by id apec 
-//  
-//        $statusRequestXml = $composition->getStatusXml('10011/120913');
-//           
-//        echo "<pre>".print_r(htmlentities($statusRequestXml),true)."</pre>"; 
-//        
-//        $PostTransaction = $soapClient->__myDoRequest($statusRequestXml, 'getPositionStatus');
+    // Process that gives status by id apec 
+    $offerAValidee = $composition->getSiiOfferAValidee(); 
 
-//        echo "<pre>".print_r(htmlentities($PostTransaction),true)."</pre>";
-//        
-//    die();
+    while($result = $this->db_query->fetch_array($offerAValidee)) {
+       	
+   	   $idOfferSii = $offerAValidee['aux_sii_id'];
+   	   
+   	   $statusRequestXml = $composition->getStatusXml($idOfferSii); 
+       echo "<pre>".print_r(htmlentities($statusRequestXml),true)."</pre>";
+       
+       $PostTransaction = $soapClient->__myDoRequest($statusRequestXml, 'getPositionStatus');
+       echo "</br>";
+       echo "<pre>".print_r(htmlentities($PostTransaction),true)."</pre>";
+       
+       $parseXml = new XmlUtils();
+       $objResponse = $parseXml->XmlToSimpleObject($PostTransaction);
+
+       echo "<pre>".print_r($objResponse,true)."</pre>";
+       echo "</br>";
+       echo "</br>";
+       
+   	   $statusOffer = $objResponse->Body->getPositionStatusResponse;
+
+	   if (is_string($statusOffer) && isset($statusOffer)) {
+	    	$sql="UPDATE aux_pfw_id_sii_apec SET aux_offer_status= '".$statusOffer."' WHERE aux_sii_id = ".$idofferAValidee;
+       		$this->db_query->query($sql);
+	   } 
+
+    }
+
     
     foreach ($dataXml as $key => $strXml){
         echo "**METHOD:**".$method[$key];
