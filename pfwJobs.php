@@ -325,6 +325,13 @@ class composeXml{
                     return $dataset["aux_sii_id"];
                 }
                 
+                public function getSiiOfferAValidee(){
+                    $sql="SELECT aux_apec_id FROM aux_pfw_id_sii_apec WHERE aux_offer_status='A VALIDEE'";
+                    $res = $this->db_query->query($sql);
+                    $dataset=$this->db_query->fetch_array($res);
+                    return $dataset;
+                }
+                
                 public function getApecOfferId($idSii){
                      $sql="SELECT  aux_apec_id FROM aux_pfw_id_sii_apec WHERE aux_sii_id='".$idSii."' ORDER BY aux_apec_id DESC limit 1";
                     $res = $this->db_query->query($sql);
