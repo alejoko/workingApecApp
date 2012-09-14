@@ -14,12 +14,16 @@
 //	`aux_job_date` DATE NOT NULL,
 //	`aux_job_time` TIME NOT NULL,
 //	`aux_job_flag_make` TINYINT(1) NOT NULL DEFAULT '0',
-//	`aux_job_operation` MEDIUMTEXT NOT NULL,
+//	`aux_job_operation` VARCHAR(20) NOT NULL,
 //	`aux_job_trigger_sentence` VARCHAR(20) NOT NULL DEFAULT '',
 //	PRIMARY KEY (`aux_pfw_id`)
 //)
 //COLLATE='utf8_general_ci'
-//ENGINE=InnoDB;
+//ENGINE=InnoDB
+//AUTO_INCREMENT=5;
+//
+//ALTER TABLE `aux_pfw_job` ADD UNIQUE INDEX `dateJobIdOperation` (`aux_job_operation`,`aux_job_id`,`aux_job_date`);
+
 //            
 //TODO: create table
 //DROP TABLE IF EXISTS `aux_pfw_id_SII_APEC`;
