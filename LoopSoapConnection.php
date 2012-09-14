@@ -64,7 +64,8 @@ class LoopSoapConnection{
                              "APECOK"       =>   0,
                              "errorCode"    =>   'Imposible launch SOAP WSDL',
                              "errorString"  =>   $e->getMessage(),
-                             "method"       =>   ''
+                             "method"       =>   '',
+                             "offerStatus"  =>   ''
                     );
                     $composition->log($arrData);
            

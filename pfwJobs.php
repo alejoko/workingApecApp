@@ -69,7 +69,7 @@ class composeXml{
                         $where = " WHERE 1";
                         $where .= " AND aux.aux_job_flag_make = 0";
                         $where .= " AND DATE(job.job_expirationdate) >= DATE( NOW() )";
-//                        $where .= " AND DATE(aux.aux_job_datetime) BETWEEN '".$this->inidate."' AND '".$this->enddate."'";
+//                      $where .= " AND aux.aux_job_date BETWEEN '".$this->inidate."' AND '".$this->enddate."'";
 
                         echo $select.$join.$where."\n";
                         $query = $this->db_query->getDataJob($select, $join, $where);  
@@ -129,14 +129,6 @@ class composeXml{
                                   // generate the id for apec SYS
                                   $timeStamp = str_replace("-", "", date("y-m-d") );
                                   $idAPEC = $result['pfwid']."/".$timeStamp;
-                                  break;
-                                  
-                              case "update":
-                                  $requestType = "updatePositionRequest";
-                                  $XMLBodyType = "A";
-                                  $this->pushMethod("updatePosition");
-                                  // read the id for apec SYS
-                                  $idAPEC = $this->getApecOfferId($result['pfwid']);
                                   break;
                                   
                               case "delete":
@@ -350,8 +342,8 @@ class composeXml{
                     $enunmes = explode ( "-", $fecha );     
                     $sumaunmes = mktime ( 0, 0, 0, date("$enunmes[1]") + 1, date("$enunmes[2]") + 1, date("$enunmes[0]") );
                     $dateInAMonth = date ("Y-m-d", $sumaunmes);
-                    $sql="INSERT INTO aux_pfw_job (aux_job_id,aux_job_datetime,aux_job_flag_make,aux_job_operation) 
-                        VALUES (".$idSii.",'".$dateInAMonth." 12:00:00',0,'insert')";
+                    $sql="INSERT INTO aux_pfw_job (aux_job_id,aux_job_date,aux_job_time,aux_job_flag_make,aux_job_operation) 
+                        VALUES (".$idSii.",'".$dateInAMonth."','12:00:00',0,'insert')";
                     $this->db_query->query($sql);
                 }
                 
@@ -371,7 +363,7 @@ class composeXml{
                         $query = $this->db_query->getDataJob($select, $join, $where); 
                         
                         while($result = $this->db_query->fetch_array($query)) {
-                            $sql = " INSERT INTO aux_pfw_job (aux_job_id,  aux_job_datetime, aux_job_flag_make, aux_job_operation) VALUES(".$result["id"]." , NOW(), 0, 'delete')";
+                            $sql = " INSERT INTO aux_pfw_job (aux_job_id,  aux_job_date, aux_job_time, aux_job_flag_make, aux_job_operation) VALUES(".$result["id"]." , DATE(NOW()), TIME(NOW()), 0, 'delete')";
                             $this->db_query->query($sql);
                         }
                 }
@@ -392,6 +384,7 @@ class composeXml{
                         $errorString    = mysql_real_escape_string($this->toISO($arrData["errorString"]));       
                         $APECStatus     = mysql_real_escape_string($this->toISO($arrData["APECStatus"]));       //uso futuro
                         $method         = mysql_real_escape_string($this->toISO($arrData["method"]));
+                        $offerStatus    = mysql_real_escape_string($this->toISO($arrData["offerStatus"]));
                         
                        echo  $sql = " INSERT INTO pfw_5_webservice_log 
                         (`pfw_wslog_tracking_id` ,
@@ -406,7 +399,9 @@ class composeXml{
                         `pfw_wslog_error_code` ,
                         `pfw_wslog_error_string` ,
                         `pfw_wslog_APEC_status` ,
-                        `pfw_wslog_APEC_method`) 
+                        `pfw_wslog_APEC_method`,
+                        `pfw_wslog_offer_status`,
+                        ) 
                         VALUES(
                         '".$tracking_id."', 
                         '".$request."' ,
@@ -420,7 +415,8 @@ class composeXml{
                         '".$errorCode."' ,
                         '".$errorString."' , 
                         '".$APECStatus."' ,
-                        '".$method."' 
+                        '".$method."',
+                        '".$offerStatus."'
                         )";
                        
                         $this->db_query->query($sql);

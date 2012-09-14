@@ -7,18 +7,19 @@
 //ADD COLUMN `job_exportAPEC` TINYINT(1) NOT NULL AFTER `job_vacancy`
 //
 //TODO: create table
-//DROP TABLE `aux_pfw_job`;
+//DROP TABLE IF EXISTS `aux_pfw_job`;
 //CREATE TABLE `aux_pfw_job` (
-//    `aux_pfw_id` INT(11) NOT NULL AUTO_INCREMENT,
-//    `aux_job_id` INT(11) NOT NULL,
-//	`aux_job_datetime` DATETIME NOT NULL,
+//	`aux_pfw_id` INT(11) NOT NULL AUTO_INCREMENT,
+//	`aux_job_id` INT(11) NOT NULL,
+//	`aux_job_date` DATE NOT NULL,
+//	`aux_job_time` TIME NOT NULL,
 //	`aux_job_flag_make` TINYINT(1) NOT NULL DEFAULT '0',
 //	`aux_job_operation` MEDIUMTEXT NOT NULL,
 //	`aux_job_trigger_sentence` VARCHAR(20) NOT NULL DEFAULT '',
 //	PRIMARY KEY (`aux_pfw_id`)
 //)
 //COLLATE='utf8_general_ci'
-//ENGINE=InnoDB
+//ENGINE=InnoDB;
 //            
 //TODO: create table
 //DROP TABLE IF EXISTS `aux_pfw_id_SII_APEC`;
@@ -56,7 +57,7 @@
 //ENGINE=InnoDB;
 
 //TODO:  make a insert value by default for field job_active.
-    
+
     require_once "config.php";
     require_once "mailClass.php";
     require_once "pfwJobs.php";
@@ -92,8 +93,6 @@
                 ); 
     }
     
-  
-    
     
     // Delete tasks of today!!
     $composition->deleteExpiredOffers();
@@ -113,10 +112,15 @@
     }
     
 //  process that gives status by id apec 
+//  
 //        $statusRequestXml = $composition->getStatusXml('10011/120913');
+//           
 //        echo "<pre>".print_r(htmlentities($statusRequestXml),true)."</pre>"; 
+//        
 //        $PostTransaction = $soapClient->__myDoRequest($statusRequestXml, 'getPositionStatus');
+
 //        echo "<pre>".print_r(htmlentities($PostTransaction),true)."</pre>";
+//        
 //    die();
     
     foreach ($dataXml as $key => $strXml){
@@ -156,7 +160,8 @@
                     "APECOK"       =>   1,
                     "errorCode"    =>   0,
                     "errorString"  =>   "",
-                    "method"       =>   $method[$key]
+                    "method"       =>   $method[$key],
+                    "offerStatus"  =>   ""
            );
            $composition->log($arrData);
                   
@@ -174,7 +179,8 @@
                     "APECOK"       =>   0,
                     "errorCode"    =>   $parseXml->ApecErrorCode,
                     "errorString"  =>   $parseXml->ApecErrorStr,
-                    "method"       =>   $method[$key]
+                    "method"       =>   $method[$key],
+                    "offerStatus"  =>   ""
            );
            $composition->log($arrData);
            

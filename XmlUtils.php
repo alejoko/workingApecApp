@@ -52,7 +52,7 @@ Class XmlUtils {
                    } else {
                                     if($objRequest->children()->Fault instanceof SimpleXMLElement){
                                         $this->ApecErrorStr = (string)$objRequest->children()->Fault->faultstring;
-                                         $this->ApecErrorStr = "yeuch";
+                                        $this->ApecErrorStr = "yeuch";
                                         echo "******************** node say false case 5"; 
                                         echo $this->ApecErrorStr;
                                     }
