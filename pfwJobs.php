@@ -438,9 +438,9 @@ class composeXml{
                            $randTimeStamp = rand(0,$timeStamp);
                            $idTransaction = $randTimeStamp.$timeStamp.$this->partnerId;
                            
-//                           $idApec = getSiiOfferId($idSii);
+                           $idApec = getSiiOfferId($idSii);
                            
-                            $requestXML='
+                           $requestXML='
                                                    <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
                                                         <S:Body>
 
