@@ -5,6 +5,10 @@
 //ADD COLUMN  `job_vacancy` INT(10) NOT NULL AFTER  `job_type`
 //ALTER TABLE `pfw_5_job`
 //ADD COLUMN `job_exportAPEC` TINYINT(1) NOT NULL AFTER `job_vacancy`
+//ALTER TABLE `aux_pfw_id_sii_apec`
+//ADD COLUMN `aux_offer_status` VARCHAR(40) NOT NULL AFTER `aux_apec_id`
+//ALTER TABLE `pfw_5_webservice_log`
+//ADD COLUMN `pfw_wslog_offer_status` VARCHAR(40) NOT NULL AFTER `pfw_wslog_APEC_method`
 //
 //TODO: create table
 //DROP TABLE IF EXISTS `aux_pfw_job`;
