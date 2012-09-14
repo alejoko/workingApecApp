@@ -68,7 +68,7 @@
     error_reporting(E_ALL);
     set_time_limit(600);
     $endpoint = ENDPOINT;    
-    header('Content-Type: text/html; charset=iso-8859-1');
+    header('Content-Type: text/html; charset=UTF-8');
     $subject = "APEC SOAP PROCESS IS LAUNCHED";
     $message = "test mail"; 
     $mail = new mailClass( "info@concatel.com" , MAIL_AUTH, $subject, $message);
@@ -91,8 +91,13 @@
                     $_SERVER['argv'][2]
                 ); 
     }
+    
+  
+    
+    
     // Delete tasks of today!!
     $composition->deleteExpiredOffers();
+    
     // Get array of data and methods
     $dataXml =  $composition->getData();
     $method  =  $composition->getMethod();
@@ -106,6 +111,13 @@
     if(!$soapClient){
         die();
     }
+    
+//  process that gives status by id apec 
+//        $statusRequestXml = $composition->getStatusXml('10011/120913');
+//        echo "<pre>".print_r(htmlentities($statusRequestXml),true)."</pre>"; 
+//        $PostTransaction = $soapClient->__myDoRequest($statusRequestXml, 'getPositionStatus');
+//        echo "<pre>".print_r(htmlentities($PostTransaction),true)."</pre>";
+//    die();
     
     foreach ($dataXml as $key => $strXml){
         echo "**METHOD:**".$method[$key];

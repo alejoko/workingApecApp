@@ -20,7 +20,7 @@
     // Defined WSDL url TEST values. These values must change in PROD
     define( 'ENDPOINT',         'http://testadepsep.apec.fr/tools?wsdl');
     define( 'WSDL_METHODS',     'http://testadepsep.apec.fr/positions?wsdl');
-    define( 'ENCODING',         'iso-8859-1');
+    define( 'ENCODING',         'UTF-8');
     
     // Defined number of attempts of connection and number of seconds between attempts
     define('SOAP_CONNNECTION_ATTEMPS',6);

@@ -34,7 +34,7 @@ class composeXml{
 
                         // DATA for build authentication element
                         $md5 = md5("id1=$this->userId&id2=$this->partnerId&pass=".$this->password."eRecrutement");
-
+                        
                         //SELECT Content
                         $select = "SELECT ";
                         $required_date_select = array (                 
@@ -69,7 +69,7 @@ class composeXml{
                         $where = " WHERE 1";
                         $where .= " AND aux.aux_job_flag_make = 0";
                         $where .= " AND DATE(job.job_expirationdate) >= DATE( NOW() )";
-                        $where .= " AND DATE(aux.aux_job_datetime) BETWEEN '".$this->inidate."' AND '".$this->enddate."'";
+//                        $where .= " AND DATE(aux.aux_job_datetime) BETWEEN '".$this->inidate."' AND '".$this->enddate."'";
 
                         echo $select.$join.$where."\n";
                         $query = $this->db_query->getDataJob($select, $join, $where);  
@@ -219,7 +219,7 @@ class composeXml{
                                                                                                       <ns3:Value>ES</ns3:Value>
                                                                                                   </ns3:Area>
                                                                                               </ns3:PhysicalLocation> 
-                                                                                              <ns3:PositionTitle>'.utf8_decode($result['job_title']).'</ns3:PositionTitle>
+                                                                                              <ns3:PositionTitle>'.utf8_encode($result['job_title']).'</ns3:PositionTitle>
                                                                                               <ns3:PositionClassification>Direct Hire</ns3:PositionClassification>
                                                                                               <ns3:Competency name="GLOBAL_EXPERIENCE_LEVEL">
                                                                                                       <ns3:CompetencyEvidence>
@@ -232,7 +232,7 @@ class composeXml{
                                                                                                               <ns3:BasePayAmountMax>'.$basepay_max.'</ns3:BasePayAmountMax>
                                                                                                       </ns3:BasePay>
                                                                                                       <ns3:OtherPay>
-                                                                                                              <ns3:OtherPayCalculation>'.utf8_decode($job_remuneration).'</ns3:OtherPayCalculation>
+                                                                                                              <ns3:OtherPayCalculation>'.utf8_encode($job_remuneration).'</ns3:OtherPayCalculation>
                                                                                                       </ns3:OtherPay>
                                                                                               </ns3:RemunerationPackage>
                                                                                       </ns3:PositionDetail>
@@ -242,14 +242,14 @@ class composeXml{
                                                                                       </ns3:FormattedPositionDescription>
                                                                                       <ns3:FormattedPositionDescription>
                                                                                               <ns3:Name>POSITION_DESCRIPTION</ns3:Name>
-                                                                                              <ns3:Value>'.utf8_decode(strip_tags($result['job_description'])).'</ns3:Value>
+                                                                                              <ns3:Value>'.utf8_encode(strip_tags($result['job_description'])).'</ns3:Value>
                                                                                       </ns3:FormattedPositionDescription>
                                                                                       <ns3:FormattedPositionDescription>
                                                                                               <ns3:Name>POSITION_DISPLAY_LOGO</ns3:Name>
                                                                                               <ns3:Value>false</ns3:Value>
                                                                                       </ns3:FormattedPositionDescription>
                                                                               </ns3:PositionProfile>
-                                                                              <ns3:NumberToFill>'.utf8_decode($result['job_vacancy']).'</ns3:NumberToFill>
+                                                                              <ns3:NumberToFill>'.utf8_encode($result['job_vacancy']).'</ns3:NumberToFill>
                                                                       </ns2:position>
                                                                  </ns2:'.$requestType.'>
                                                           </S:Body>
@@ -431,5 +431,47 @@ class composeXml{
                   $cadena = mb_convert_encoding($cadena, "ISO-8859-1", "UTF-8"); 
                   return $cadena; 
                 } 
+                
+               public function getStatusXml($idApec){
+                   
+                            $requestType = "getPositionStatusRequest";
+                            // DATA for build authentication element
+                            $md5 = md5("id1=$this->userId&id2=$this->partnerId&pass=".$this->password."eRecrutement");
+                            
+                           $timeStamp = strtotime(date('Y-m-d H:i:s'));
+                           $randTimeStamp = rand(0,$timeStamp);
+                           $idTransaction = $randTimeStamp.$timeStamp.$this->partnerId;
+                           
+//                           $idApec = getSiiOfferId($idSii);
+                           
+                            $requestXML='
+                                                   <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+                                                        <S:Body>
+
+                                                          <ns2:'.$requestType.' xmlns:ns2="http://adep.apec.fr/hrxml/sep" xmlns:ns3="http://ns.hr-xml.org/2006-02-28">
+
+                                                             <ns2:authentication>
+                                                                   <ns2:userId>'.$this->userId.'</ns2:userId>
+                                                                   <ns2:partnerId>'.$this->partnerId.'</ns2:partnerId>
+                                                                   <ns2:md5Key>'.$md5.'</ns2:md5Key>
+                                                            </ns2:authentication>
+
+                                                             <ns2:UniquePayloadTrackingId idOwner="CLIENT">
+                                                                 <ns3:IdValue>'.$idTransaction.'</ns3:IdValue>
+                                                             </ns2:UniquePayloadTrackingId>
+
+                                                             <ns2:clientPositionId idOwner="CLIENT">
+                                                                    <ns3:IdValue>'.$idApec.'</ns3:IdValue>
+                                                             </ns2:clientPositionId>
+
+
+                                                          </ns2:'.$requestType.'>
+
+                                                        </S:Body>
+                                                    </S:Envelope>';
+                            
+                            return $requestXML;
+                   
+               }
 }
 ?> 
