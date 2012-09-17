@@ -326,10 +326,13 @@ class composeXml{
                 }
                 
                 public function getSiiOfferAValidee(){
-                    $sql="SELECT aux_apec_id FROM aux_pfw_id_sii_apec WHERE aux_offer_status='A VALIDEE'";
+                   $result= array();
+                   $sql="SELECT DISTINCT aux_sii_id FROM aux_pfw_id_sii_apec WHERE aux_offer_status='AVALIDER'";
                     $res = $this->db_query->query($sql);
-                    $dataset=$this->db_query->fetch_array($res);
-                    return $dataset;
+                    while($resArr = $this->db_query->fetch_array($res)) {
+                        $result[] = $resArr;
+                    }
+                    return $result;
                 }
                 
                 public function getApecOfferId($idSii){
@@ -435,7 +438,7 @@ class composeXml{
                   return $cadena; 
                 } 
                 
-               public function getStatusXml($idApec){
+               public function getStatusXml($idSii){
                    
                             $requestType = "getPositionStatusRequest";
                             // DATA for build authentication element
@@ -445,7 +448,7 @@ class composeXml{
                            $randTimeStamp = rand(0,$timeStamp);
                            $idTransaction = $randTimeStamp.$timeStamp.$this->partnerId;
                            
-                           $idApec = getSiiOfferId($idSii);
+                           $idApec = $this->getApecOfferId($idSii);
                            
                            $requestXML='
                                                    <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
@@ -476,5 +479,10 @@ class composeXml{
                             return $requestXML;
                    
                }
-}
+               
+               public function setStatusOffer($statusOffer,$idSii){
+                   echo $sql="UPDATE aux_pfw_id_sii_apec SET aux_offer_status= '".$statusOffer."' WHERE aux_sii_id = '".$idSii."'";
+                    $this->db_query->query($sql);
+               }
+    }
 ?> 
