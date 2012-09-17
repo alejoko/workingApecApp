@@ -52,18 +52,19 @@
 //	`pfw_wslog_id_jobAPEC` VARCHAR(40) NOT NULL,
 //	`pfw_wslog_dateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 //	`pfw_wslog_SOAP_ok` TINYINT(1) NOT NULL,
-//	`pfw_wslog_APEC_ok` TINYINT(1) NULL DEFAULT NULL,
+//	`pfw_wslog_APEC_ok` TINYINT(1) NOT NULL,
 //	`pfw_wslog_error_code` VARCHAR(40) NOT NULL DEFAULT '',
 //	`pfw_wslog_error_string` VARCHAR(254) NOT NULL DEFAULT '',
 //	`pfw_wslog_APEC_status` VARCHAR(40) NULL DEFAULT NULL,
 //	`pfw_wslog_APEC_method` VARCHAR(40) NOT NULL,
+//	`pfw_wslog_offer_status` VARCHAR(40) NOT NULL,
 //	PRIMARY KEY (`pfw_wslog_id`),
 //	INDEX `pfw_wslog_id_jobSii` (`pfw_wslog_id_jobSii`)
 //)
 //COMMENT='pfw_wslog_tracking_id'
 //COLLATE='latin1_swedish_ci'
-//ENGINE=InnoDB;
-
+//ENGINE=InnoDB
+//AUTO_INCREMENT=71;
 //TODO:  make a insert value by default for field job_active.
 
     require_once "config.php";
@@ -122,54 +123,54 @@
     // Process that gives status by id apec 
     $offerAValidee = $composition->getApecOfferAValidee(); 
     
+//
+//  foreach ($offerAValidee as $result) {
+//       	
+//   $idOfferApec = $result['aux_apec_id'];
+// 
+//    $statusRequestXml = $composition->getStatusXml($idOfferApec); 
+//    
+//       echo "<pre>".print_r(htmlentities($statusRequestXml),true)."</pre>";
+//       
+//       $PostTransaction = $soapClient->__myDoRequest($statusRequestXml, 'getPositionStatus');
+//       echo "</br>";
+//       echo "<pre>".print_r(htmlentities($PostTransaction),true)."</pre>";
+//       
+//       $parseXml = new XmlUtils();
+//       $objResponse = $parseXml->XmlToSimpleObject($PostTransaction);
+//
+//       echo "<pre>".print_r($objResponse,true)."</pre>";
+//       echo "</br>";
+//       echo "</br>";
+//       
+//   	   $statusOffer = $objResponse->Body->getPositionStatusResponse;
+//           if ( ($statusOffer instanceof SimpleXMLElement) && (strlen((string)$statusOffer)>0) ) {
+//               
+//               $composition->setStatusOffer((string)$statusOffer, $idOfferApec);
+//                
+//                // log results
+//                $arrData = array(
+//                         "tracking_id"  =>   $composition->trackingId,
+//                         "request"      =>   $statusRequestXml,
+//                         "response"     =>   $PostTransaction,
+//                         "daemonTaskId" =>   0,
+//                         "idSii"        =>   $composition->getSiiOfferId($idOfferApec),
+//                         "idApec"       =>   $idOfferApec,
+//                         "SOAPOK"       =>   1,
+//                         "APECOK"       =>   1,
+//                         "errorCode"    =>   0,
+//                         "errorString"  =>   "",
+//                         "method"       =>   "getPositionStatus",
+//                         "offerStatus"  =>   (string)$statusOffer
+//                );
+//                $composition->log($arrData);
+//               
+//	   } 
+//           
+//    }
 
-  foreach ($offerAValidee as $result) {
-       	
-   $idOfferApec = $result['aux_apec_id'];
  
-    $statusRequestXml = $composition->getStatusXml($idOfferApec); 
-    
-       echo "<pre>".print_r(htmlentities($statusRequestXml),true)."</pre>";
-       
-       $PostTransaction = $soapClient->__myDoRequest($statusRequestXml, 'getPositionStatus');
-       echo "</br>";
-       echo "<pre>".print_r(htmlentities($PostTransaction),true)."</pre>";
-       
-       $parseXml = new XmlUtils();
-       $objResponse = $parseXml->XmlToSimpleObject($PostTransaction);
-
-       echo "<pre>".print_r($objResponse,true)."</pre>";
-       echo "</br>";
-       echo "</br>";
-       
-   	   $statusOffer = $objResponse->Body->getPositionStatusResponse;
-           if ( ($statusOffer instanceof SimpleXMLElement) && (strlen((string)$statusOffer)>0) ) {
-               
-               $composition->setStatusOffer((string)$statusOffer, $idOfferApec);
-                
-                // log results
-                $arrData = array(
-                         "tracking_id"  =>   $composition->trackingId,
-                         "request"      =>   $statusRequestXml,
-                         "response"     =>   $PostTransaction,
-                         "daemonTaskId" =>   0,
-                         "idSii"        =>   $composition->getSiiOfferId($idOfferApec),
-                         "idApec"       =>   $idOfferApec,
-                         "SOAPOK"       =>   1,
-                         "APECOK"       =>   1,
-                         "errorCode"    =>   0,
-                         "errorString"  =>   "",
-                         "method"       =>   "getPositionStatus",
-                         "offerStatus"  =>   (string)$statusOffer
-                );
-                $composition->log($arrData);
-               
-	   } 
-           
-    }
-
  
-    die();
     foreach ($dataXml as $key => $strXml){
         echo "**METHOD:**".$method[$key];
         echo "<pre>".print_r(htmlentities($strXml),true)."</pre>"; 

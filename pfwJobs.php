@@ -127,7 +127,7 @@ class composeXml{
                                   $XMLBodyType = "A";
                                   $this->pushMethod("openPosition");
                                   // generate the id for apec SYS
-                                  $timeStamp = str_replace("-", "", date("y-m-d") );
+                                  $timeStamp = str_replace("-", "", date("y-m-d-H-i-s") );
                                   $idAPEC = $result['pfwid']."/".$timeStamp;
                                   break;
                                   
