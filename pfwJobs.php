@@ -18,6 +18,7 @@ class composeXml{
                 private $password;
                 private $inidate;
                 private $enddate;
+                public $trackingId;
                 
                 public function __construct($partner,$user,$pwd,$idate,$edate){
 			       $this->partnerId = $partner;
@@ -83,8 +84,7 @@ class composeXml{
                            echo "<br/>mysql fetch_array<br/>";
                            $timeStamp = strtotime(date('Y-m-d H:i:s'));
                            $randTimeStamp = rand(0,$timeStamp);
-                           $idTransaction = $randTimeStamp.$timeStamp.$this->partnerId;
-                           echo $idTransaction."<br/>";
+                          $this->trackingId = $randTimeStamp.$timeStamp.$this->partnerId;
                            
                            // set job daemon id and offer id 
                            $this->pushDaemonJobId($result['daemonJobId']);
@@ -175,7 +175,7 @@ class composeXml{
                                                             </ns2:authentication>
 
                                                              <ns2:UniquePayloadTrackingId idOwner="CLIENT">
-                                                                 <ns3:IdValue>'.$idTransaction.'</ns3:IdValue>
+                                                                 <ns3:IdValue>'.$this->trackingId.'</ns3:IdValue>
                                                              </ns2:UniquePayloadTrackingId>
 
                                                               <ns2:position>
@@ -263,7 +263,7 @@ class composeXml{
                                                             </ns2:authentication>
 
                                                              <ns2:UniquePayloadTrackingId idOwner="CLIENT">
-                                                                 <ns3:IdValue>'.$idTransaction.'</ns3:IdValue>
+                                                                 <ns3:IdValue>'.$this->trackingId.'</ns3:IdValue>
                                                              </ns2:UniquePayloadTrackingId>
 
                                                              <ns2:clientPositionId idOwner="CLIENT">
@@ -325,9 +325,9 @@ class composeXml{
                     return $dataset["aux_sii_id"];
                 }
                 
-                public function getSiiOfferAValidee(){
+                public function getApecOfferAValidee(){
                    $result= array();
-                   $sql="SELECT DISTINCT aux_sii_id FROM aux_pfw_id_sii_apec WHERE aux_offer_status='AVALIDER'";
+                   $sql="SELECT aux_apec_id FROM aux_pfw_id_sii_apec WHERE aux_offer_status='AVALIDER'";
                     $res = $this->db_query->query($sql);
                     while($resArr = $this->db_query->fetch_array($res)) {
                         $result[] = $resArr;
@@ -335,12 +335,7 @@ class composeXml{
                     return $result;
                 }
                 
-                public function getApecOfferId($idSii){
-                     $sql="SELECT  aux_apec_id FROM aux_pfw_id_sii_apec WHERE aux_sii_id='".$idSii."' ORDER BY aux_apec_id DESC limit 1";
-                    $res = $this->db_query->query($sql);
-                    $dataset=$this->db_query->fetch_array($res);
-                    return $dataset["aux_apec_id"];
-                }
+              
                 
                 public function setWorkOk($TableAuxJobId){ 
                     $sql = "UPDATE aux_pfw_job SET aux_job_flag_make=1 WHERE aux_pfw_id='".$TableAuxJobId."'";
@@ -410,7 +405,7 @@ class composeXml{
                         `pfw_wslog_error_string` ,
                         `pfw_wslog_APEC_status` ,
                         `pfw_wslog_APEC_method`,
-                        `pfw_wslog_offer_status`,
+                        `pfw_wslog_offer_status`
                         ) 
                         VALUES(
                         '".$tracking_id."', 
@@ -438,7 +433,7 @@ class composeXml{
                   return $cadena; 
                 } 
                 
-               public function getStatusXml($idSii){
+               public function getStatusXml($idApec){
                    
                             $requestType = "getPositionStatusRequest";
                             // DATA for build authentication element
@@ -446,9 +441,9 @@ class composeXml{
                             
                            $timeStamp = strtotime(date('Y-m-d H:i:s'));
                            $randTimeStamp = rand(0,$timeStamp);
-                           $idTransaction = $randTimeStamp.$timeStamp.$this->partnerId;
+                           $this->trackingId = $randTimeStamp.$timeStamp.$this->partnerId;
                            
-                           $idApec = $this->getApecOfferId($idSii);
+                          
                            
                            $requestXML='
                                                    <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
@@ -463,7 +458,7 @@ class composeXml{
                                                             </ns2:authentication>
 
                                                              <ns2:UniquePayloadTrackingId idOwner="CLIENT">
-                                                                 <ns3:IdValue>'.$idTransaction.'</ns3:IdValue>
+                                                                 <ns3:IdValue>'.$this->trackingId.'</ns3:IdValue>
                                                              </ns2:UniquePayloadTrackingId>
 
                                                              <ns2:clientPositionId idOwner="CLIENT">
@@ -480,8 +475,15 @@ class composeXml{
                    
                }
                
-               public function setStatusOffer($statusOffer,$idSii){
-                   echo $sql="UPDATE aux_pfw_id_sii_apec SET aux_offer_status= '".$statusOffer."' WHERE aux_sii_id = '".$idSii."'";
+                public function getApecOfferId($idSii){
+                     $sql="SELECT  aux_apec_id FROM aux_pfw_id_sii_apec WHERE aux_sii_id='".$idSii."' ORDER BY aux_apec_id DESC limit 1";
+                    $res = $this->db_query->query($sql);
+                    $dataset=$this->db_query->fetch_array($res);
+                    return $dataset["aux_apec_id"];
+                }
+                
+               public function setStatusOffer($statusOffer,$idApec){
+                   echo $sql="UPDATE aux_pfw_id_sii_apec SET aux_offer_status= '".$statusOffer."' WHERE aux_apec_id = '".$idApec."'";
                     $this->db_query->query($sql);
                }
     }
