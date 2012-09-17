@@ -49,7 +49,9 @@ class LoopSoapConnection{
                    $composition = new composeXml(
                                 PARTNERID,
                                 USERID,
-                                PASSWORD
+                                PASSWORD,
+                                INIDATE,
+                                ENDDATE
                             ); 
                             
                     // log results:
