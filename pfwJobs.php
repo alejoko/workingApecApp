@@ -71,9 +71,11 @@ class composeXml{
                         $where = " WHERE 1";
                         $where .= " AND aux.aux_job_flag_make = 0";
                         $where .= " AND DATE(job.job_expirationdate) >= DATE( NOW() )";
+                        $where .= " AND aux.aux_job_id NOT IN (SELECT aux_sii_id FROM aux_pfw_id_sii_apec WHERE aux_offer_status = 'AVALIDER')";
 //                      $where .= " AND aux.aux_job_date BETWEEN '".$this->inidate."' AND '".$this->enddate."'";
 
                         echo $select.$join.$where."\n";
+                        die();
                         $query = $this->db_query->getDataJob($select, $join, $where);  
                         
                         //XML Building
@@ -85,7 +87,7 @@ class composeXml{
                            echo "<br/>mysql fetch_array<br/>";
                            $timeStamp = strtotime(date('Y-m-d H:i:s'));
                            $randTimeStamp = rand(0,$timeStamp);
-                          $this->trackingId = $randTimeStamp.$timeStamp.$this->partnerId;
+                           $this->trackingId = $randTimeStamp.$timeStamp.$this->partnerId;
                            
                            // set job daemon id and offer id 
                            $this->pushDaemonJobId($result['daemonJobId']);
@@ -128,7 +130,7 @@ class composeXml{
                                   $XMLBodyType = "A";
                                   $this->pushMethod("openPosition");
                                   // generate the id for apec SYS
-                                  $timeStamp = str_replace("-", "", date("y-m-d-H-i-s") );
+                                  $timeStamp = str_replace("-", "", date("y-m-d") );
                                   $idAPEC = $result['pfwid']."/".$timeStamp;
                                   break;
                                   
@@ -477,7 +479,7 @@ class composeXml{
                }
                
                 public function getApecOfferId($idSii){
-                     $sql="SELECT  aux_apec_id FROM aux_pfw_id_sii_apec WHERE aux_sii_id='".$idSii."' ORDER BY aux_apec_id DESC limit 1";
+                    $sql="SELECT  aux_apec_id FROM aux_pfw_id_sii_apec WHERE aux_sii_id='".$idSii."' ORDER BY aux_apec_id DESC limit 1";
                     $res = $this->db_query->query($sql);
                     $dataset=$this->db_query->fetch_array($res);
                     return $dataset["aux_apec_id"];
