@@ -83,7 +83,7 @@
     $mail = new mailClass( "info@concatel.com" , MAIL_AUTH, $subject, $message);
     $mail->send();
 
-    if(!isset($_SERVER['argv'][1]) && !isset($_SERVER['argv'][2])){
+    //if(!isset($_SERVER['argv'][1]) && !isset($_SERVER['argv'][2])){
     	$composition = new composeXml(
                     PARTNERID,
                     USERID,
@@ -91,7 +91,7 @@
                     INIDATE,
                     ENDDATE
                 ); 
-    }else{ 
+    /*}else{ 
     	$composition = new composeXml(
                     PARTNERID,
                     USERID,
@@ -99,7 +99,7 @@
                     $_SERVER['argv'][1],
                     $_SERVER['argv'][2]
                 ); 
-    }
+    }*/
     
     
     // Delete tasks of today!!
