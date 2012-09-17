@@ -25,4 +25,6 @@
     // Defined number of attempts of connection and number of seconds between attempts
     define('SOAP_CONNNECTION_ATTEMPS',6);
     define('SECONDS_BETWEEN_ATTEMPS',4);
+    
+    define('SECONDS_SLEEP_AND_CHECK',90);
 ?>

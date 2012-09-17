@@ -42,8 +42,10 @@ class LoopSoapConnection{
                     $send = $mail->send();
                     if($send){
                             print "SOAP process fail: an email has been sent to managers";
+                            echo "<br/>";
                         } else {
                             print "SOAP process fail! And is impossible to delivery an email by SMTP!!"; 
+                            echo "<br/>";
                         }
                     
                    $composition = new composeXml(

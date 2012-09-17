@@ -18,8 +18,7 @@ class composeXml{
                 private $password;
                 private $inidate;
                 private $enddate;
-                private $idTaskTable;
-                public $trackingId;
+                public  $trackingId;
                 
                 public function __construct($partner,$user,$pwd,$idate,$edate){
 			       $this->partnerId = $partner;
@@ -72,19 +71,18 @@ class composeXml{
                         $where .= " AND aux.aux_job_flag_make = 0";
                         $where .= " AND DATE(job.job_expirationdate) >= DATE( NOW() )";
                         $where .= " AND aux.aux_job_id NOT IN (SELECT aux_sii_id FROM aux_pfw_id_sii_apec WHERE aux_offer_status = 'AVALIDER')";
-//                      $where .= " AND aux.aux_job_date BETWEEN '".$this->inidate."' AND '".$this->enddate."'";
+                        $where .= " AND aux.aux_job_date BETWEEN '".$this->inidate."' AND '".$this->enddate."'";
 
                         echo $select.$join.$where."\n";
-                        die();
+                        echo "<br/>";
+                     
                         $query = $this->db_query->getDataJob($select, $join, $where);  
                         
                         //XML Building
                         $requestXML = array();
 
-
                         while($result = $this->db_query->fetch_array($query)) {
-                           
-                           echo "<br/>mysql fetch_array<br/>";
+                            
                            $timeStamp = strtotime(date('Y-m-d H:i:s'));
                            $randTimeStamp = rand(0,$timeStamp);
                            $this->trackingId = $randTimeStamp.$timeStamp.$this->partnerId;
@@ -130,7 +128,7 @@ class composeXml{
                                   $XMLBodyType = "A";
                                   $this->pushMethod("openPosition");
                                   // generate the id for apec SYS
-                                  $timeStamp = str_replace("-", "", date("y-m-d") );
+                                  $timeStamp = str_replace("-", "", date("y-m-d-H-i-s") );
                                   $idAPEC = $result['pfwid']."/".$timeStamp;
                                   break;
                                   
@@ -345,11 +343,16 @@ class composeXml{
                     $this->db_query->query($sql);
                 }
                 
+                
                 public function openSameOfferOneMonth($idSii){
                     $fecha = date("Y-m-d");
                     $enunmes = explode ( "-", $fecha );     
                     $sumaunmes = mktime ( 0, 0, 0, date("$enunmes[1]") + 1, date("$enunmes[2]") + 1, date("$enunmes[0]") );
                     $dateInAMonth = date ("Y-m-d", $sumaunmes);
+                    $deleteInAMonth = "DELETE FROM aux_pfw_job WHERE aux_job_id = ".$idSii;
+                    $deleteInAMonth .= " AND aux_job_date > '".$fecha."'";
+                    $deleteInAMonth .= " AND aux_job_operation = 'insert'";
+                    $this->db_query->query($deleteInAMonth);
                     $sql="INSERT INTO aux_pfw_job (aux_job_id,aux_job_date,aux_job_time,aux_job_flag_make,aux_job_operation) 
                         VALUES (".$idSii.",'".$dateInAMonth."','12:00:00',0,'insert')";
                     $this->db_query->query($sql);
@@ -367,6 +370,7 @@ class composeXml{
                         $where .= " AND DATE(job_expirationdate) = DATE( NOW() )";
 
                         echo $select.$join.$where."\n";
+                        echo "<br/>";
                         
                         $query = $this->db_query->getDataJob($select, $join, $where); 
                         
@@ -426,7 +430,7 @@ class composeXml{
                         '".$method."',
                         '".$offerStatus."'
                         )";
-                       
+                         echo "<br/>";
                         $this->db_query->query($sql);
                 }
                 

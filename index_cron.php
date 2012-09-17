@@ -84,6 +84,11 @@
     $mail = new mailClass( "info@concatel.com" , MAIL_AUTH, $subject, $message);
     $mail->send();
 
+    
+   echo "************************** MAKING NEW XML COMPOSITION *********************************";
+   echo "<br/>";
+   echo "FIRS PART: WE CHECK STATUS OF OUR 'AVALIDER' (DANGER STATE) OFFERS";
+   echo "<br/>";
     //if(!isset($_SERVER['argv'][1]) && !isset($_SERVER['argv'][2])){
     	$composition = new composeXml(
                     PARTNERID,
@@ -101,17 +106,14 @@
                     $_SERVER['argv'][2]
                 ); 
     }*/
-    
+        
+   echo "SECOND PART: WE CREATE TASKS FOR DELETE EXPIRED OFFERS";
+   echo "<br/>";
     
     // Delete tasks of today!!
     $composition->deleteExpiredOffers();
     
-    // Get array of data and methods
-    $dataXml =  $composition->getData();
-    $method  =  $composition->getMethod();
-    // Get Daemon Job Id and Offer Id (Sii system)
-    $daemonJobId = $composition->getDaemonJobId();
-    $idOfferSii  = $composition->getIdOfferSii();
+
     
     $loop = new LoopSoapConnection();
     $soapClient = $loop->attemptsInLoopSoapConn($endpoint);
@@ -133,15 +135,15 @@
        echo "<pre>".print_r(htmlentities($statusRequestXml),true)."</pre>";
        
        $PostTransaction = $soapClient->__myDoRequest($statusRequestXml, 'getPositionStatus');
-       echo "</br>";
+       echo "<br/>";
        echo "<pre>".print_r(htmlentities($PostTransaction),true)."</pre>";
        
        $parseXml = new XmlUtils();
        $objResponse = $parseXml->XmlToSimpleObject($PostTransaction);
 
        echo "<pre>".print_r($objResponse,true)."</pre>";
-       echo "</br>";
-       echo "</br>";
+       echo "<br/>";
+       echo "<br/>";
        
    	   $statusOffer = $objResponse->Body->getPositionStatusResponse;
            if ( ($statusOffer instanceof SimpleXMLElement) && (strlen((string)$statusOffer)>0) ) {
@@ -168,8 +170,39 @@
 	   } 
            
     }
+    
+   echo "************************** MAKING NEW XML COMPOSITION *********************************";
+   echo "<br/>";
+   echo "THIRD PART: WE MAKE THE TASKS WE ASSIGNED IN TABLE";
+   echo "<br/>";
+    
+    //if(!isset($_SERVER['argv'][1]) && !isset($_SERVER['argv'][2])){
+    	$composition = new composeXml(
+                    PARTNERID,
+                    USERID,
+                    PASSWORD,
+                    INIDATE,
+                    ENDDATE
+                ); 
+    /*}else{ 
+    	$composition = new composeXml(
+                    PARTNERID,
+                    USERID,
+                    PASSWORD,
+                    $_SERVER['argv'][1],
+                    $_SERVER['argv'][2]
+                ); 
+    }*/
+        
 
- 
+     // Get array of data and methods
+    $dataXml =  $composition->getData();
+    $method  =  $composition->getMethod();
+    // Get Daemon Job Id and Offer Id (Sii system)
+    $daemonJobId = $composition->getDaemonJobId();
+    $idOfferSii  = $composition->getIdOfferSii();
+    
+    $idApecTransactionOk = array();
  
     foreach ($dataXml as $key => $strXml){
         echo "**METHOD:**".$method[$key];
@@ -177,17 +210,19 @@
        
        $PostTransaction = $soapClient->__myDoRequest($strXml, $method[$key]);
        
-       echo "</br>";
+       echo "<br/>";
        echo "<pre>".print_r(htmlentities($PostTransaction),true)."</pre>"; 
        
        $parseXml = new XmlUtils();
        $objResponse = $parseXml->XmlToSimpleObject($PostTransaction);
 
        echo "<pre>".print_r($objResponse,true)."</pre>";
-       echo "</br>";
-       echo "</br>";
+       echo "<br/>";
+       echo "<br/>";
        
        if($parseXml->isResponseOK($objResponse)){
+           
+           $idApecTransactionOk[] = $parseXml->idOfferApec;
            
            if($method[$key] == "openPosition"){
                 $composition->setApecOfferId($idOfferSii[$key],$parseXml->idOfferApec);
@@ -235,5 +270,76 @@
        }
        
     }
+    
+   echo "************************** MAKING NEW XML COMPOSITION *********************************";
+   echo "<br/>";
+   echo "FOURTH PART: WE CHECK THE STATUS OF THE OFFERS WE HAVE PLAY TODAY AFTER SLEEP";
+   echo "<br/>";
+   
+    sleep(SECONDS_SLEEP_AND_CHECK);
+   
+    //if(!isset($_SERVER['argv'][1]) && !isset($_SERVER['argv'][2])){
+    	$composition = new composeXml(
+                    PARTNERID,
+                    USERID,
+                    PASSWORD,
+                    INIDATE,
+                    ENDDATE
+                ); 
+    /*}else{ 
+    	$composition = new composeXml(
+                    PARTNERID,
+                    USERID,
+                    PASSWORD,
+                    $_SERVER['argv'][1],
+                    $_SERVER['argv'][2]
+                ); 
+    }*/
+    
+        if( (is_array($idApecTransactionOk)) && (count($idApecTransactionOk)>0) ){
+            
+                foreach ($idApecTransactionOk as $idApec){
+                    
+                        $statusRequestXml = $composition->getStatusXml($idApec);
+
+                        echo "<pre>".print_r(htmlentities($statusRequestXml),true)."</pre>";
+                        $PostTransaction = $soapClient->__myDoRequest($statusRequestXml, 'getPositionStatus');
+                        echo "</br>";
+                        echo "<pre>".print_r(htmlentities($PostTransaction),true)."</pre>";
+
+                       $parseXml = new XmlUtils();
+                       $objResponse = $parseXml->XmlToSimpleObject($PostTransaction);
+
+                       echo "<pre>".print_r($objResponse,true)."</pre>";
+                       echo "</br>";
+                       echo "</br>";
+
+                           $statusOffer = $objResponse->Body->getPositionStatusResponse;
+                           if ( ($statusOffer instanceof SimpleXMLElement) && (strlen((string)$statusOffer)>0) ) {
+
+                               $composition->setStatusOffer((string)$statusOffer, $idApec);
+
+                                // log results
+                                $arrData = array(
+                                         "tracking_id"  =>   $composition->trackingId,
+                                         "request"      =>   $statusRequestXml,
+                                         "response"     =>   $PostTransaction,
+                                         "daemonTaskId" =>   0,
+                                         "idSii"        =>   $composition->getSiiOfferId($idApec),
+                                         "idApec"       =>   $idApec,
+                                         "SOAPOK"       =>   1,
+                                         "APECOK"       =>   1,
+                                         "errorCode"    =>   0,
+                                         "errorString"  =>   "",
+                                         "method"       =>   "getPositionStatus",
+                                         "offerStatus"  =>   (string)$statusOffer
+                                );
+                                $composition->log($arrData);
+
+                           }
+                           
+                 }  
+        }
+
   
 ?>
