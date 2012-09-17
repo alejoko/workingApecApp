@@ -18,6 +18,7 @@ class composeXml{
                 private $password;
                 private $inidate;
                 private $enddate;
+                private $idTaskTable;
                 public $trackingId;
                 
                 public function __construct($partner,$user,$pwd,$idate,$edate){
@@ -485,6 +486,10 @@ class composeXml{
                public function setStatusOffer($statusOffer,$idApec){
                    echo $sql="UPDATE aux_pfw_id_sii_apec SET aux_offer_status= '".$statusOffer."' WHERE aux_apec_id = '".$idApec."'";
                     $this->db_query->query($sql);
+               }
+               
+               public function getIDsFromTaskTable(){
+                   
                }
     }
 ?> 
