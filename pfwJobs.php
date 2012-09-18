@@ -281,10 +281,6 @@ class composeXml{
                           }
                         }
 
-                //        $temp = array();
-                //        $temp[] = $requestXML[0];
-                //        return $temp;
-
                         return $requestXML;
                 }
  
@@ -326,7 +322,7 @@ class composeXml{
                 
                 public function getApecOfferAValidee(){
                    $result= array();
-                   $sql="SELECT aux_apec_id FROM aux_pfw_id_sii_apec WHERE aux_offer_status='AVALIDER' OR aux_offer_status IS NULL";
+                    $sql="SELECT aux_apec_id FROM aux_pfw_id_sii_apec WHERE aux_offer_status='AVALIDER' OR aux_offer_status IS NULL";
                     $res = $this->db_query->query($sql);
                     while($resArr = $this->db_query->fetch_array($res)) {
                         $result[] = $resArr;
