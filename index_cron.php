@@ -88,9 +88,9 @@
     $mail->send();
 
    echo "************************** MAKING NEW XML COMPOSITION *********************************";
-   
+   echo "<br/>";
    echo "FIRS PART: WE CHECK STATUS OF OUR 'AVALIDER' (DANGER STATE) OFFERS";
-   
+   echo "<br/>";
     //if(!isset($_SERVER['argv'][1]) && !isset($_SERVER['argv'][2])){
     	$composition = new composeXml(
                     PARTNERID,
@@ -110,7 +110,7 @@
     }*/
     
    echo "SECOND PART: WE CREATE TASKS FOR DELETE EXPIRED OFFERS";
-   
+   echo "<br/>";
     
     // Delete tasks of today!!
     $composition->deleteExpiredOffers();
@@ -136,20 +136,15 @@
        
        $PostTransaction = $soapClient->__myDoRequest($statusRequestXml, 'getPositionStatus');
        
-       echo "<pre>".print_r(htmlentities($PostTransaction),true)."</pre>";
-       
        $parseXml = new XmlUtils();
        $objResponse = $parseXml->XmlToSimpleObject($PostTransaction);
 
        echo "<pre>".print_r($objResponse,true)."</pre>";
        
-       
-       
    	   $statusOffer = $objResponse->Body->getPositionStatusResponse;
            if ( ($statusOffer instanceof SimpleXMLElement) && (strlen((string)$statusOffer)>0) ) {
                
                $composition->setStatusOffer((string)$statusOffer, $idOfferApec);
-                
                 // log results
                 $arrData = array(
                          "tracking_id"  =>   $composition->trackingId,
@@ -166,15 +161,14 @@
                          "offerStatus"  =>   (string)$statusOffer
                 );
                 $composition->log($arrData);
-               
 	   } 
            
     }
     
    echo "************************** MAKING NEW XML COMPOSITION *********************************";
-   
+   echo "<br/>";
    echo "THIRD PART: WE MAKE THE TASKS WE ASSIGNED IN TABLE";
-   
+   echo "<br/>";
     
     //if(!isset($_SERVER['argv'][1]) && !isset($_SERVER['argv'][2])){
     	$composition = new composeXml(
@@ -204,13 +198,10 @@
     $idApecTransactionOk = array();
  
     foreach ($dataXml as $key => $strXml){
-        echo "**METHOD:**".$method[$key];
+        
         echo "<pre>".print_r(htmlentities($strXml),true)."</pre>"; 
        
        $PostTransaction = $soapClient->__myDoRequest($strXml, $method[$key]);
-       
-       
-       echo "<pre>".print_r(htmlentities($PostTransaction),true)."</pre>"; 
        
        $parseXml = new XmlUtils();
        $objResponse = $parseXml->XmlToSimpleObject($PostTransaction);
@@ -271,9 +262,9 @@
     }
     
    echo "************************** MAKING NEW XML COMPOSITION *********************************";
-   
+   echo "<br/>";
    echo "FOURTH PART: WE CHECK THE STATUS OF THE OFFERS WE HAVE PLAY TODAY AFTER SLEEP";
-   
+   echo "<br/>";
    
     sleep(SECONDS_SLEEP_AND_CHECK);
    
@@ -303,8 +294,6 @@
 
                         echo "<pre>".print_r(htmlentities($statusRequestXml),true)."</pre>";
                         $PostTransaction = $soapClient->__myDoRequest($statusRequestXml, 'getPositionStatus');
-                        
-                        echo "<pre>".print_r(htmlentities($PostTransaction),true)."</pre>";
 
                        $parseXml = new XmlUtils();
                        $objResponse = $parseXml->XmlToSimpleObject($PostTransaction);

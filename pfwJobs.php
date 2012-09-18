@@ -74,7 +74,7 @@ class composeXml{
                         $where .= " AND aux.aux_job_date BETWEEN '".$this->inidate."' AND '".$this->enddate."'";
 
                         echo $select.$join.$where."\n";
-                        echo "<br/>";
+  
                      
                         $query = $this->db_query->getDataJob($select, $join, $where);  
                         
@@ -97,7 +97,6 @@ class composeXml{
                           }
                            
                           switch ($result['job_experience']){
-                          	
                                 case 3: // 0 - 2 Years
                                         $job_experience = 1;
                                         $basepay_min = 0;
@@ -117,8 +116,7 @@ class composeXml{
                                         $job_experience = 3;
                                         $basepay_min = 2000;
                                         $basepay_max = 3000;
-                                break;
-                                
+                                break;  
                           }
                         
                           switch($result['operation']){
@@ -328,14 +326,13 @@ class composeXml{
                 
                 public function getApecOfferAValidee(){
                    $result= array();
-                   $sql="SELECT aux_apec_id FROM aux_pfw_id_sii_apec WHERE aux_offer_status='AVALIDER'";
+                   $sql="SELECT aux_apec_id FROM aux_pfw_id_sii_apec WHERE aux_offer_status='AVALIDER' OR aux_offer_status IS NULL";
                     $res = $this->db_query->query($sql);
                     while($resArr = $this->db_query->fetch_array($res)) {
                         $result[] = $resArr;
                     }
                     return $result;
                 }
-                
          
                 public function setWorkOk($TableAuxJobId){ 
                     $sql = "UPDATE aux_pfw_job SET aux_job_flag_make=1 WHERE aux_pfw_id='".$TableAuxJobId."'";
