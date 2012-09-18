@@ -86,12 +86,39 @@
     $message = "test mail"; 
     $mail = new mailClass( "info@concatel.com" , MAIL_AUTH, $subject, $message);
     $mail->send();
+    
+    if (isset($_GET['idate_day']) && isset($_GET['idate_month']) && isset($_GET['idate_year']) 
+    	&& ($_GET['idate_day']!= null) && ($_GET['idate_month']!= null) && ($_GET['idate_year']!= null)
+    	&& ($_GET['idate_year'] >= 1900))
+    {
+    	if($_GET['idate_day']<10){
+    		$_GET['idate_day'] = "0".$_GET['idate_day'];
+    	}
+    	if($_GET['idate_month']<10){
+    		$_GET['idate_month'] = "0".$_GET['idate_month'];
+    	}
+    	$idate = $_GET['idate_year']."-".$_GET['idate_month']."-".$_GET['idate_day']." 00:00:00";
+    }
+    
+    if (isset($_GET['edate_day']) && isset($_GET['edate_month']) && isset($_GET['edate_year']) 
+    	&& ($_GET['edate_day']!= null) && ($_GET['edate_month']!= null) && ($_GET['edate_year']!= null)
+    	&& ($_GET['edate_year'] >= 1900))
+    {
+    	if($_GET['edate_day']<10){
+    		$_GET['edate_day'] = "0".$_GET['edate_day'];
+    	}
+    	if($_GET['edate_month']<10){
+    		$_GET['edate_month'] = "0".$_GET['edate_month'];
+    	}
+    	$edate = $_GET['edate_year']."-".$_GET['edate_month']."-".$_GET['edate_day']." 23:59:59";
+    }
 
    echo "************************** MAKING NEW XML COMPOSITION *********************************";
    echo "<br/>";
    echo "FIRS PART: WE CHECK STATUS OF OUR 'AVALIDER' (DANGER STATE) OFFERS";
    echo "<br/>";
-    //if(!isset($_SERVER['argv'][1]) && !isset($_SERVER['argv'][2])){
+   
+   if(!isset($idate) && !isset($edate) || (($idate == null) || ($edate == null))){
     	$composition = new composeXml(
                     PARTNERID,
                     USERID,
@@ -99,15 +126,15 @@
                     INIDATE,
                     ENDDATE
                 ); 
-    /*}else{ 
+    }else{ 
     	$composition = new composeXml(
                     PARTNERID,
                     USERID,
                     PASSWORD,
-                    $_SERVER['argv'][1],
-                    $_SERVER['argv'][2]
+                    $idate,
+                    $edate
                 ); 
-    }*/
+    }
     
    echo "SECOND PART: WE CREATE TASKS FOR DELETE EXPIRED OFFERS";
    echo "<br/>";
