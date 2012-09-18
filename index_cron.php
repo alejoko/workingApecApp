@@ -197,7 +197,7 @@
    echo "THIRD PART: WE MAKE THE TASKS WE ASSIGNED IN TABLE";
    echo "<br/>";
     
-    //if(!isset($_SERVER['argv'][1]) && !isset($_SERVER['argv'][2])){
+   if(!isset($idate) && !isset($edate) || (($idate == null) || ($edate == null))){
     	$composition = new composeXml(
                     PARTNERID,
                     USERID,
@@ -205,15 +205,15 @@
                     INIDATE,
                     ENDDATE
                 ); 
-    /*}else{ 
+    }else{ 
     	$composition = new composeXml(
                     PARTNERID,
                     USERID,
                     PASSWORD,
-                    $_SERVER['argv'][1],
-                    $_SERVER['argv'][2]
+                    $idate,
+                    $edate
                 ); 
-    }*/
+    }
         
      // Get array of data and methods
     $dataXml =  $composition->getData();
@@ -295,7 +295,7 @@
    
     sleep(SECONDS_SLEEP_AND_CHECK);
    
-    //if(!isset($_SERVER['argv'][1]) && !isset($_SERVER['argv'][2])){
+      if(!isset($idate) && !isset($edate) || (($idate == null) || ($edate == null))){
     	$composition = new composeXml(
                     PARTNERID,
                     USERID,
@@ -303,15 +303,15 @@
                     INIDATE,
                     ENDDATE
                 ); 
-    /*}else{ 
+    }else{ 
     	$composition = new composeXml(
                     PARTNERID,
                     USERID,
                     PASSWORD,
-                    $_SERVER['argv'][1],
-                    $_SERVER['argv'][2]
+                    $idate,
+                    $edate
                 ); 
-    }*/
+    }
     
         if( (is_array($idApecTransactionOk)) && (count($idApecTransactionOk)>0) ){
             
