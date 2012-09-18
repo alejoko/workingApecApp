@@ -88,6 +88,8 @@
     
     if (isset($_GET['idate_day']) && isset($_GET['idate_month']) && isset($_GET['idate_year']) 
     	&& ($_GET['idate_day']!= null) && ($_GET['idate_month']!= null) && ($_GET['idate_year']!= null)
+    	&& ($_GET['idate_day'] >= 1 && $_GET['idate_day'] <= 31)
+    	&& ($_GET['idate_month'] >= 1 && $_GET['idate_month'] <= 12) 
     	&& ($_GET['idate_year'] >= 1900))
     {
     	if($_GET['idate_day']<10){
@@ -101,7 +103,8 @@
     
     if (isset($_GET['edate_day']) && isset($_GET['edate_month']) && isset($_GET['edate_year']) 
     	&& ($_GET['edate_day']!= null) && ($_GET['edate_month']!= null) && ($_GET['edate_year']!= null)
-    	&& ($_GET['edate_year'] >= 1900))
+    	&& ($_GET['edate_day'] >= 1 && $_GET['edate_day'] <= 31)
+    	&& ($_GET['edate_month'] >= 1 && $_GET['edate_month'] <= 12) && ($_GET['edate_year'] >= 1900))
     {
     	if($_GET['edate_day']<10){
     		$_GET['edate_day'] = "0".$_GET['edate_day'];
