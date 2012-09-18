@@ -24,8 +24,6 @@ Class XmlUtils {
                 }
             }
             $this->nameSpacesArr = $nameSpacesArr;
-            echo "**^STRING OBJ";
-//            echo $string =   preg_replace("/<([a-z][a-z0-9]*)[^>]*?(\/?)>/i",'<$1$2>', $string);
             echo "<pre>".print_r($string,true)."</pre>";
             return $objetcToReturn =  simplexml_load_string($string);
     }

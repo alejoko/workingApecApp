@@ -336,16 +336,14 @@ class composeXml{
                     return $result;
                 }
                 
-              
-                
+         
                 public function setWorkOk($TableAuxJobId){ 
                     $sql = "UPDATE aux_pfw_job SET aux_job_flag_make=1 WHERE aux_pfw_id='".$TableAuxJobId."'";
                     $this->db_query->query($sql);
                 }
-                
-                
+           
                 public function openSameOfferOneMonth($idSii){
-                    $fecha = date("Y-m-d");
+                    $fecha = date("Y-m-d"); 
                     $enunmes = explode ( "-", $fecha );     
                     $sumaunmes = mktime ( 0, 0, 0, date("$enunmes[1]") + 1, date("$enunmes[2]") + 1, date("$enunmes[0]") );
                     $dateInAMonth = date ("Y-m-d", $sumaunmes);
@@ -367,7 +365,7 @@ class composeXml{
                         $where = " WHERE 1";
                         $where .= " AND job_exportAPEC = 1";
                         $where .= " AND job_active = 1 ";
-                        $where .= " AND DATE(job_expirationdate) = DATE( NOW() )";
+                        $where .= " AND DATE(job_expirationdate) BETWEEN '".$this->inidate."' AND '".$this->enddate."'";
 
                         echo $select.$join.$where."\n";
                         echo "<br/>";
@@ -398,7 +396,7 @@ class composeXml{
                         $method         = mysql_real_escape_string($this->toISO($arrData["method"]));
                         $offerStatus    = mysql_real_escape_string($this->toISO($arrData["offerStatus"]));
                         
-                       echo  $sql = " INSERT INTO pfw_5_webservice_log 
+                         $sql = " INSERT INTO pfw_5_webservice_log 
                         (`pfw_wslog_tracking_id` ,
                         `pfw_wslog_request` ,
                         `pfw_wslog_response` ,
@@ -492,10 +490,6 @@ class composeXml{
                public function setStatusOffer($statusOffer,$idApec){
                    echo $sql="UPDATE aux_pfw_id_sii_apec SET aux_offer_status= '".$statusOffer."' WHERE aux_apec_id = '".$idApec."'";
                     $this->db_query->query($sql);
-               }
-               
-               public function getIDsFromTaskTable(){
-                   
                }
     }
 ?> 

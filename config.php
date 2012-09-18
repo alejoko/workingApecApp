@@ -27,4 +27,5 @@
     define('SECONDS_BETWEEN_ATTEMPS',4);
     
     define('SECONDS_SLEEP_AND_CHECK',90);
+    define('TIME_SCRIPT_EXECUTION_LIMIT',600);
 ?>

@@ -66,7 +66,10 @@
 //ENGINE=InnoDB
 //AUTO_INCREMENT=71;
 //TODO:  make a insert value by default for field job_active.
-
+  
+    error_reporting(E_ERROR & ~E_COMPILE_ERROR);
+    
+    
     require_once "config.php";
     require_once "mailClass.php";
     require_once "pfwJobs.php";
@@ -75,8 +78,8 @@
     require_once "XmlUtils.php";
     require_once "LoopSoapConnection.php";
     
-    error_reporting(E_ALL);
-    set_time_limit(600);
+    set_time_limit(TIME_SCRIPT_EXECUTION_LIMIT);
+    
     $endpoint = ENDPOINT;    
     header('Content-Type: text/html; charset=UTF-8');
     $subject = "APEC SOAP PROCESS IS LAUNCHED";
@@ -84,11 +87,10 @@
     $mail = new mailClass( "info@concatel.com" , MAIL_AUTH, $subject, $message);
     $mail->send();
 
-    
    echo "************************** MAKING NEW XML COMPOSITION *********************************";
-   echo "<br/>";
+   
    echo "FIRS PART: WE CHECK STATUS OF OUR 'AVALIDER' (DANGER STATE) OFFERS";
-   echo "<br/>";
+   
     //if(!isset($_SERVER['argv'][1]) && !isset($_SERVER['argv'][2])){
     	$composition = new composeXml(
                     PARTNERID,
@@ -106,15 +108,13 @@
                     $_SERVER['argv'][2]
                 ); 
     }*/
-        
+    
    echo "SECOND PART: WE CREATE TASKS FOR DELETE EXPIRED OFFERS";
-   echo "<br/>";
+   
     
     // Delete tasks of today!!
     $composition->deleteExpiredOffers();
-    
-
-    
+ 
     $loop = new LoopSoapConnection();
     $soapClient = $loop->attemptsInLoopSoapConn($endpoint);
     
@@ -135,15 +135,15 @@
        echo "<pre>".print_r(htmlentities($statusRequestXml),true)."</pre>";
        
        $PostTransaction = $soapClient->__myDoRequest($statusRequestXml, 'getPositionStatus');
-       echo "<br/>";
+       
        echo "<pre>".print_r(htmlentities($PostTransaction),true)."</pre>";
        
        $parseXml = new XmlUtils();
        $objResponse = $parseXml->XmlToSimpleObject($PostTransaction);
 
        echo "<pre>".print_r($objResponse,true)."</pre>";
-       echo "<br/>";
-       echo "<br/>";
+       
+       
        
    	   $statusOffer = $objResponse->Body->getPositionStatusResponse;
            if ( ($statusOffer instanceof SimpleXMLElement) && (strlen((string)$statusOffer)>0) ) {
@@ -172,9 +172,9 @@
     }
     
    echo "************************** MAKING NEW XML COMPOSITION *********************************";
-   echo "<br/>";
+   
    echo "THIRD PART: WE MAKE THE TASKS WE ASSIGNED IN TABLE";
-   echo "<br/>";
+   
     
     //if(!isset($_SERVER['argv'][1]) && !isset($_SERVER['argv'][2])){
     	$composition = new composeXml(
@@ -194,7 +194,6 @@
                 ); 
     }*/
         
-
      // Get array of data and methods
     $dataXml =  $composition->getData();
     $method  =  $composition->getMethod();
@@ -210,15 +209,15 @@
        
        $PostTransaction = $soapClient->__myDoRequest($strXml, $method[$key]);
        
-       echo "<br/>";
+       
        echo "<pre>".print_r(htmlentities($PostTransaction),true)."</pre>"; 
        
        $parseXml = new XmlUtils();
        $objResponse = $parseXml->XmlToSimpleObject($PostTransaction);
 
        echo "<pre>".print_r($objResponse,true)."</pre>";
-       echo "<br/>";
-       echo "<br/>";
+       
+       
        
        if($parseXml->isResponseOK($objResponse)){
            
@@ -272,9 +271,9 @@
     }
     
    echo "************************** MAKING NEW XML COMPOSITION *********************************";
-   echo "<br/>";
+   
    echo "FOURTH PART: WE CHECK THE STATUS OF THE OFFERS WE HAVE PLAY TODAY AFTER SLEEP";
-   echo "<br/>";
+   
    
     sleep(SECONDS_SLEEP_AND_CHECK);
    
@@ -304,15 +303,15 @@
 
                         echo "<pre>".print_r(htmlentities($statusRequestXml),true)."</pre>";
                         $PostTransaction = $soapClient->__myDoRequest($statusRequestXml, 'getPositionStatus');
-                        echo "</br>";
+                        
                         echo "<pre>".print_r(htmlentities($PostTransaction),true)."</pre>";
 
                        $parseXml = new XmlUtils();
                        $objResponse = $parseXml->XmlToSimpleObject($PostTransaction);
 
                        echo "<pre>".print_r($objResponse,true)."</pre>";
-                       echo "</br>";
-                       echo "</br>";
+                       
+                       
 
                            $statusOffer = $objResponse->Body->getPositionStatusResponse;
                            if ( ($statusOffer instanceof SimpleXMLElement) && (strlen((string)$statusOffer)>0) ) {
