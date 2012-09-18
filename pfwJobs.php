@@ -39,6 +39,7 @@ class composeXml{
                         //SELECT Content
                         $select = "SELECT ";
                         $required_date_select = array (                 
+                                                                        'aux.aux_job_date as dateOfWork',
                                                                         'aux.aux_pfw_id as daemonJobId',
                                                                         'aux.aux_job_operation as operation',
                                                                         'job.pfwid',
@@ -126,7 +127,7 @@ class composeXml{
                                   $XMLBodyType = "A";
                                   $this->pushMethod("openPosition");
                                   // generate the id for apec SYS
-                                  $timeStamp = str_replace("-", "", date("y-m-d") );
+                                  $timeStamp = str_replace("-", "", substr($result['dateOfWork'], 2) );
                                   $idAPEC = $result['pfwid']."/".$timeStamp;
                                   break;
                                   
