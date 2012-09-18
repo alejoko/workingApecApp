@@ -73,7 +73,7 @@ class composeXml{
                         $where .= " AND aux.aux_job_id NOT IN (SELECT aux_sii_id FROM aux_pfw_id_sii_apec WHERE aux_offer_status = 'AVALIDER')";
                         $where .= " AND aux.aux_job_date BETWEEN '".$this->inidate."' AND '".$this->enddate."'";
 
-                        echo $select.$join.$where."\n";
+                        $select.$join.$where."\n";
   
                      
                         $query = $this->db_query->getDataJob($select, $join, $where);  

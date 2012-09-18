@@ -69,7 +69,6 @@
   
     error_reporting(E_ERROR & ~E_COMPILE_ERROR);
     
-    
     require_once "config.php";
     require_once "mailClass.php";
     require_once "pfwJobs.php";
