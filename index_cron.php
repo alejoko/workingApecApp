@@ -111,11 +111,6 @@
     	$edate = $_GET['edate_year']."-".$_GET['edate_month']."-".$_GET['edate_day']." 23:59:59";
     }
 
-   echo "************************** MAKING NEW XML COMPOSITION *********************************";
-   echo "<br/>";
-   echo "FIRS PART: WE CHECK STATUS OF OUR 'AVALIDER' (DANGER STATE) OFFERS";
-   echo "<br/>";
-   
    if(!isset($idate) && !isset($edate) || (($idate == null) || ($edate == null))){
     	$composition = new composeXml(
                     PARTNERID,
@@ -137,6 +132,11 @@
     $semaphore = $composition->getSemaphore(); 
 
     if($semaphore == 0){
+       
+       echo "************************** MAKING NEW XML COMPOSITION *********************************";
+	   echo "<br/>";
+	   echo "FIRS PART: WE CHECK STATUS OF OUR 'AVALIDER' (DANGER STATE) OFFERS";
+	   echo "<br/>";
     	
        $semaphore = $composition->setSemaphore(1);
        	
@@ -358,6 +358,13 @@
 	                 }  
 	        }
 	        $semaphore = $composition->setSemaphore(0);
+    }else{
+       
+       echo "************************** ACTION NOT COMPLETED *********************************";
+	   echo "<br/>";
+	   echo "ANOTHER APPLICATION INSTANCE IS IN PROGRESS. PLEASE, YOU MUST WAIT TO FINISH IT.THANKS.";
+	   echo "<br/>";
+	   echo "*********************************************************************************";
     }
 
   
