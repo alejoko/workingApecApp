@@ -24,6 +24,7 @@ class LoopSoapConnection{
                        'encoding'       => ENCODING
                        )
                    ); 
+                    var_dump($soapClient);
                    return $soapClient;
              
             } catch (Exception $e) {
