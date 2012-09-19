@@ -70,7 +70,7 @@ class composeXml{
                         //WHERE Content
                         $where = " WHERE 1";
                         $where .= " AND aux.aux_job_flag_make = 0";
-                        $where .= " AND DATE(job.job_expirationdate) >= DATE( NOW() )";
+                        $where .= " AND (DATE(job.job_expirationdate) >= DATE(NOW()))";
                         $where .= " AND aux.aux_job_id NOT IN (SELECT aux_sii_id FROM aux_pfw_id_sii_apec WHERE aux_offer_status = 'AVALIDER')";
                         $where .= " AND aux.aux_job_date BETWEEN '".$this->inidate."' AND '".$this->enddate."'";
 
@@ -314,6 +314,11 @@ class composeXml{
                     $this->db_query->query($sql);
                 }
                 
+				public function setSemaphore($value_semaphore){
+                    $sql="UPDATE aux_pfw_semaphore SET aux_semaphore = ".$value_semaphore;
+                    $this->db_query->query($sql);
+                }
+                
                 public function getSiiOfferId($idApec){
                     $sql="SELECT  aux_sii_id FROM aux_pfw_id_sii_apec WHERE aux_apec_id='".$idApec."' limit 1";
                     $res = $this->db_query->query($sql);
@@ -372,6 +377,15 @@ class composeXml{
                         }
                 }
                 
+				public function getSemaphore(){
+
+					$sql="SELECT aux_semaphore FROM aux_pfw_semaphore";
+                    $res = $this->db_query->query($sql);
+                    $dataset=$this->db_query->fetch_array($res);
+                    return $dataset["aux_semaphore"];
+                    
+                }
+                
                 public function log($arrData){
                         
                         $arrData["APECStatus"] = "";
@@ -390,21 +404,21 @@ class composeXml{
                         $method         = mysql_real_escape_string($this->toISO($arrData["method"]));
                         $offerStatus    = mysql_real_escape_string($this->toISO($arrData["offerStatus"]));
                         
-                         $sql = " INSERT INTO pfw_5_webservice_log 
-                        (`pfw_wslog_tracking_id` ,
-                        `pfw_wslog_request` ,
-                        `pfw_wslog_response` ,
+                         $sql = " INSERT INTO aux_webservice_log 
+                        (`aux_wslog_tracking_id` ,
+                        `aux_wslog_request` ,
+                        `aux_wslog_response` ,
                         `id_task_auxTable` ,
-                        `pfw_wslog_id_jobSii` ,
-                        `pfw_wslog_id_jobAPEC` ,
-                        `pfw_wslog_dateTime`,
-                        `pfw_wslog_SOAP_ok` ,
-                        `pfw_wslog_APEC_ok` ,
-                        `pfw_wslog_error_code` ,
-                        `pfw_wslog_error_string` ,
-                        `pfw_wslog_APEC_status` ,
-                        `pfw_wslog_APEC_method`,
-                        `pfw_wslog_offer_status`
+                        `aux_wslog_id_jobSii` ,
+                        `aux_wslog_id_jobAPEC` ,
+                        `aux_wslog_dateTime`,
+                        `aux_wslog_SOAP_ok` ,
+                        `aux_wslog_APEC_ok` ,
+                        `aux_wslog_error_code` ,
+                        `aux_wslog_error_string` ,
+                        `aux_wslog_APEC_status` ,
+                        `aux_wslog_APEC_method`,
+                        `aux_wslog_offer_status`
                         ) 
                         VALUES(
                         '".$tracking_id."', 
