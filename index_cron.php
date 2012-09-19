@@ -81,11 +81,7 @@
     
     $endpoint = ENDPOINT;    
     header('Content-Type: text/html; charset=UTF-8');
-    $subject = "APEC SOAP PROCESS IS LAUNCHED";
-    $message = "test mail"; 
-    $mail = new mailClass( "info@concatel.com" , MAIL_AUTH, $subject, $message);
-    $mail->send();
-    
+
     if (isset($_GET['idate_day']) && isset($_GET['idate_month']) && isset($_GET['idate_year']) 
     	&& ($_GET['idate_day']!= null) && ($_GET['idate_month']!= null) && ($_GET['idate_year']!= null)
     	&& ($_GET['idate_day'] >= 1 && $_GET['idate_day'] <= 31)
