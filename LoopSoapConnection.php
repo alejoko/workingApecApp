@@ -33,6 +33,7 @@ class LoopSoapConnection{
                 echo $e->getMessage(); 
                 if ($i==$this->attempts){
                     
+                    $composition = new composeXml();
                     $semaphore = $composition->setSemaphore(0);
                     
                     $subject = "APEC SOAP PROCESS FAIL!";
