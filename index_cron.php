@@ -329,8 +329,6 @@
 
                        echo "<pre>".print_r($objResponse,true)."</pre>";
                        
-                       
-
                            $statusOffer = $objResponse->Body->getPositionStatusResponse;
                            if ( ($statusOffer instanceof SimpleXMLElement) && (strlen((string)$statusOffer)>0) ) {
 

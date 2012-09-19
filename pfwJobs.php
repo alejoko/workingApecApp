@@ -208,7 +208,7 @@ class composeXml{
                                                                                               <ns3:PhysicalLocation>
                                                                                                   <ns3:Name>LOCATION_CODE</ns3:Name>
                                                                                                   <ns3:Area>
-                                                                                                      <ns3:Value>FR</ns3:Value>
+                                                                                                      <ns3:Value>ES</ns3:Value>
                                                                                                   </ns3:Area>
                                                                                               </ns3:PhysicalLocation> 
                                                                                               <ns3:PositionTitle>'.utf8_encode($result['job_title']).'</ns3:PositionTitle>
