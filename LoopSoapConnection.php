@@ -33,6 +33,8 @@ class LoopSoapConnection{
                 echo $e->getMessage(); 
                 if ($i==$this->attempts){
                     
+                    $semaphore = $composition->setSemaphore(0);
+                    
                     $subject = "APEC SOAP PROCESS FAIL!";
                     $message = "
                         The APEC soap connnection fail after ".$this->attempts." attemps.
@@ -72,7 +74,7 @@ class LoopSoapConnection{
                              "offerStatus"  =>   ''
                     );
                     $composition->log($arrData);
-           
+                    throw $e;
                     return false; // important!!: return breaks the loop!
                     
                 }

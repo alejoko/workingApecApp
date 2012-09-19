@@ -152,10 +152,6 @@
 		    $loop = new LoopSoapConnection();
 		    $soapClient = $loop->attemptsInLoopSoapConn($endpoint);
 		    
-		    if(!$soapClient){
-		        die();
-		    }
-		    
 		    // Process that gives status by id apec 
 		    $offerAValidee = $composition->getApecOfferAValidee(); 
 		    
