@@ -24,7 +24,8 @@ class LoopSoapConnection{
                        'encoding'       => ENCODING
                        )
                    ); 
-                    var_dump($soapClient);
+                   var_dump($soapClient);
+                   var_dump( get_resource_type($soapClient->sdl) );
                    return $soapClient;
              
             } catch (Exception $e) {
@@ -33,8 +34,15 @@ class LoopSoapConnection{
                 echo "<h2>Exception Error!</h2>"; 
                 echo $e->getMessage(); 
                 if ($i==$this->attempts){
+                
+                    $composition = new composeXml(
+                                PARTNERID,
+                                USERID,
+                                PASSWORD,
+                                INIDATE,
+                                ENDDATE
+                            ); 
                     
-                    $composition = new composeXml();
                     $semaphore = $composition->setSemaphore(0);
                     
                     $subject = "APEC SOAP PROCESS FAIL!";
@@ -51,15 +59,7 @@ class LoopSoapConnection{
                             print "SOAP process fail! And is impossible to delivery an email by SMTP!!"; 
                             echo "<br/>";
                         }
-                    
-                   $composition = new composeXml(
-                                PARTNERID,
-                                USERID,
-                                PASSWORD,
-                                INIDATE,
-                                ENDDATE
-                            ); 
-                            
+                     
                     // log results:
                     $arrData = array(
                              "tracking_id"  =>   '',
@@ -81,7 +81,7 @@ class LoopSoapConnection{
                     
                 }
                 sleep($this->sleep);
-                ++$i;
+                $i++;
                 
             }   
 
