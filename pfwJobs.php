@@ -127,7 +127,7 @@ class composeXml{
                                   $XMLBodyType = "A";
                                   $this->pushMethod("openPosition");
                                   // generate the id for apec SYS
-                                  $timeStamp = str_replace("-", "", date('y-m-d-H-i-s') );
+                                  $timeStamp = str_replace("-", "", substr($result['dateOfWork'], 2) );
                                   $idAPEC = $result['pfwid']."/".$timeStamp;
                                   break;
                                   
@@ -496,7 +496,17 @@ class composeXml{
                 }
                 
                public function setStatusOffer($statusOffer,$idApec){
-                   echo $sql="UPDATE aux_pfw_id_sii_apec SET aux_offer_status= '".$statusOffer."' WHERE aux_apec_id = '".$idApec."'";
+                    $sql="UPDATE aux_pfw_id_sii_apec SET aux_offer_status= '".$statusOffer."' WHERE aux_apec_id = '".$idApec."'";
+                    $this->db_query->query($sql);
+               }
+               
+			   public function lockTables(){
+               		$sql="LOCK TABLES aux_pfw_job WRITE";
+                    $this->db_query->query($sql);
+               }
+               
+			   public function unlockTables(){
+               		$sql="UNLOCK TABLES";
                     $this->db_query->query($sql);
                }
     }
