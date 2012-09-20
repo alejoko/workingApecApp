@@ -80,7 +80,7 @@
 	    
 		    // Delete tasks of today!!
 		    $composition->deleteExpiredOffers();
-		 
+
 		    $loop = new LoopSoapConnection();
 		    $soapClient = $loop->attemptsInLoopSoapConn($endpoint);
 		    
