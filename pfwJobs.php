@@ -16,16 +16,12 @@ class composeXml{
                 private $partnerId;
                 private $userId;
                 private $password;
-                private $inidate;
-                private $enddate;
                 public  $trackingId;
                 
-                public function __construct($partner,$user,$pwd,$idate,$edate){
+                public function __construct($partner,$user,$pwd){
 			       $this->partnerId = $partner;
 			       $this->userId = $user;
 			       $this->password = $pwd;
-			       $this->inidate = $idate;
-			       $this->enddate = $edate;
                    
 			       $this->db_query = new mySQL();
 			    } 
@@ -72,10 +68,11 @@ class composeXml{
                         $where .= " AND aux.aux_job_flag_make = 0";
                         $where .= " AND (DATE(job.job_expirationdate) >= DATE(NOW()))";
                         $where .= " AND aux.aux_job_id NOT IN (SELECT aux_sii_id FROM aux_pfw_id_sii_apec WHERE aux_offer_status = 'AVALIDER')";
-                        $where .= " AND aux.aux_job_date BETWEEN '".$this->inidate."' AND '".$this->enddate."'";
-
-                        $select.$join.$where."\n";
-  
+                        $where .= " AND aux.aux_job_date <= DATE(NOW()) ";
+                        
+                        ECHO "$$";
+                        ECHO $select.$join.$where."\n";
+                        ECHO "$$";
                      
                         $query = $this->db_query->getDataJob($select, $join, $where);  
                         
@@ -364,7 +361,7 @@ class composeXml{
                         $where = " WHERE 1";
                         $where .= " AND job_exportAPEC = 1";
                         $where .= " AND job_active = 1 ";
-                        $where .= " AND DATE(job_expirationdate) BETWEEN '".$this->inidate."' AND '".$this->enddate."'";
+                        $where .= " AND DATE(job_expirationdate) = DATE( NOW( ))";
 
                         echo $select.$join.$where."\n";
                         echo "<br/>";
