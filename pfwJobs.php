@@ -19,11 +19,13 @@ class composeXml{
                 public  $trackingId;
                 
                 public function __construct($partner,$user,$pwd){
+
 			       $this->partnerId = $partner;
 			       $this->userId = $user;
 			       $this->password = $pwd;
-                   
+
 			       $this->db_query = new mySQL();
+			       
 			    } 
                 
                     
@@ -361,7 +363,9 @@ class composeXml{
                         $where = " WHERE 1";
                         $where .= " AND job_exportAPEC = 1";
                         $where .= " AND job_active = 1 ";
-                        $where .= " AND DATE(job_expirationdate) = DATE( NOW( ))";
+                        $where .= " AND job_expired = 0 ";
+                        $where .= " AND DATE(job_expirationdate) < NOW()";
+
 
                         echo $select.$join.$where."\n";
                         echo "<br/>";

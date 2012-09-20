@@ -14,54 +14,8 @@
     $endpoint = ENDPOINT;    
     header('Content-Type: text/html; charset=UTF-8');
  
-    
-    if (isset($_GET['idate_day']) && isset($_GET['idate_month']) && isset($_GET['idate_year']) 
-    	&& ($_GET['idate_day']!= null) && ($_GET['idate_month']!= null) && ($_GET['idate_year']!= null)
-    	&& ($_GET['idate_day'] >= 1 && $_GET['idate_day'] <= 31)
-    	&& ($_GET['idate_month'] >= 1 && $_GET['idate_month'] <= 12) 
-    	&& ($_GET['idate_year'] >= 1900))
-    {
-    	if($_GET['idate_day']<10){
-    		$_GET['idate_day'] = "0".$_GET['idate_day'];
-    	}
-    	if($_GET['idate_month']<10){
-    		$_GET['idate_month'] = "0".$_GET['idate_month'];
-    	}
-    	$idate = $_GET['idate_year']."-".$_GET['idate_month']."-".$_GET['idate_day']." 00:00:00";
-    }
-    
-    if (isset($_GET['edate_day']) && isset($_GET['edate_month']) && isset($_GET['edate_year']) 
-    	&& ($_GET['edate_day']!= null) && ($_GET['edate_month']!= null) && ($_GET['edate_year']!= null)
-    	&& ($_GET['edate_day'] >= 1 && $_GET['edate_day'] <= 31)
-    	&& ($_GET['edate_month'] >= 1 && $_GET['edate_month'] <= 12) && ($_GET['edate_year'] >= 1900))
-    {
-    	if($_GET['edate_day']<10){
-    		$_GET['edate_day'] = "0".$_GET['edate_day'];
-    	}
-    	if($_GET['edate_month']<10){
-    		$_GET['edate_month'] = "0".$_GET['edate_month'];
-    	}
-    	$edate = $_GET['edate_year']."-".$_GET['edate_month']."-".$_GET['edate_day']." 23:59:59";
-    }
+    $composition = new composeXml( PARTNERID, USERID, PASSWORD ); 
 
-   if(!isset($idate) && !isset($edate) || (($idate == null) || ($edate == null))){
-    	$composition = new composeXml(
-                    PARTNERID,
-                    USERID,
-                    PASSWORD,
-                    INIDATE,
-                    ENDDATE
-                ); 
-    }else{ 
-    	$composition = new composeXml(
-                    PARTNERID,
-                    USERID,
-                    PASSWORD,
-                    $idate,
-                    $edate
-                ); 
-    }
-    
     try{
     	
 	    $semaphore = $composition->getSemaphore(); 
@@ -132,23 +86,7 @@
 		   echo "THIRD PART: WE MAKE THE TASKS WE ASSIGNED IN TABLE";
 		   echo "<br/>";
 		    
-		   if(!isset($idate) && !isset($edate) || (($idate == null) || ($edate == null))){
-		    	$composition = new composeXml(
-		                    PARTNERID,
-		                    USERID,
-		                    PASSWORD,
-		                    INIDATE,
-		                    ENDDATE
-		                ); 
-		    }else{ 
-		    	$composition = new composeXml(
-		                    PARTNERID,
-		                    USERID,
-		                    PASSWORD,
-		                    $idate,
-		                    $edate
-		                ); 
-		    }
+		   $composition = new composeXml( PARTNERID, USERID, PASSWORD ); 
 		        
 		     // Get array of data and methods
 		    $dataXml =  $composition->getData();
@@ -228,25 +166,9 @@
 		   echo "FOURTH PART: WE CHECK THE STATUS OF THE OFFERS WE HAVE PLAY TODAY AFTER SLEEP";
 		   echo "<br/>";
 		   
-		    sleep(SECONDS_SLEEP_AND_CHECK);
+		   sleep(SECONDS_SLEEP_AND_CHECK);
 		   
-		      if(!isset($idate) && !isset($edate) || (($idate == null) || ($edate == null))){
-		    	$composition = new composeXml(
-		                    PARTNERID,
-		                    USERID,
-		                    PASSWORD,
-		                    INIDATE,
-		                    ENDDATE
-		                ); 
-		    }else{ 
-		    	$composition = new composeXml(
-		                    PARTNERID,
-		                    USERID,
-		                    PASSWORD,
-		                    $idate,
-		                    $edate
-		                ); 
-		    }
+		   $composition = new composeXml( PARTNERID, USERID, PASSWORD ); 
 		    
 		        if( (is_array($idApecTransactionOk)) && (count($idApecTransactionOk)>0) ){
 		            
