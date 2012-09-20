@@ -13,10 +13,6 @@
     define( 'USERID',    'rdesnos@sii.fr');
     define( 'PASSWORD',  'K2A2P7Y9');
     
-    // Defined default dates (date initial and date end)
-    define( 'INIDATE', date("Y-m-d 00:00:00") );
-    define( 'ENDDATE', date("Y-m-d 23:59:59") );
-    
     // Defined WSDL url TEST values. These values must change in PROD
     define( 'ENDPOINT',         'http://testadepsep.apec.fr/tools?wsdl');
     define( 'WSDL_METHODS',     'http://testadepsep.apec.fr/positions?wsdl');
