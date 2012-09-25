@@ -22,12 +22,11 @@
 	
 	    if($semaphore == 0){
 	       
-	       echo "************************** MAKING NEW XML COMPOSITION *********************************";
+                   echo "************************** MAKING NEW XML COMPOSITION *********************************";
 		   echo "<br/>";
-		   echo "FIRS PART: WE CHECK STATUS OF OUR 'AVALIDER' (DANGER STATE) OFFERS";
+		   echo "FIRST PART: WE CHECK STATUS OF OUR 'AVALIDER' (DANGER STATE) OFFERS";
 		   echo "<br/>";
-	    	
-	       $semaphore = $composition->setSemaphore(1);
+                   $semaphore = $composition->setSemaphore(1);
 	       	
 		   echo "SECOND PART: WE CREATE TASKS FOR DELETE EXPIRED OFFERS";
 		   echo "<br/>";
@@ -39,9 +38,8 @@
 		    $soapClient = $loop->attemptsInLoopSoapConn($endpoint);
 		    
 		    // Process that gives status by id apec 
-		    $offerAValidee = $composition->getApecOfferAValidee(); 
-		    
-		
+		    $offerAValidee = $composition->getApecOfferAValidee();
+                    
 		  foreach ($offerAValidee as $result) {
 		       	
 		   $idOfferApec = $result['aux_apec_id'];
@@ -51,15 +49,15 @@
 		       echo "<pre>".print_r(htmlentities($statusRequestXml),true)."</pre>";
 		       
 		       $PostTransaction = $soapClient->__myDoRequest($statusRequestXml, 'getPositionStatus');
-		       
+                       
 		       $parseXml = new XmlUtils();
 		       $objResponse = $parseXml->XmlToSimpleObject($PostTransaction);
 		
 		       echo "<pre>".print_r($objResponse,true)."</pre>";
 		       
 		   	   $statusOffer = $objResponse->Body->getPositionStatusResponse;
-		           if ( ($statusOffer instanceof SimpleXMLElement) && (strlen((string)$statusOffer)>0) ) {
-		               
+                           
+		           if ( ($statusOffer instanceof SimpleXMLElement) && (strlen((string)$statusOffer)>0) ) {    
 		               $composition->setStatusOffer((string)$statusOffer, $idOfferApec);
 		                // log results
 		                $arrData = array(
@@ -77,8 +75,7 @@
 		                         "offerStatus"  =>   (string)$statusOffer
 		                );
 		                $composition->log($arrData);
-			   } 
-		           
+			   }
 		    }
 		    
 		   echo "************************** MAKING NEW XML COMPOSITION *********************************";
@@ -91,6 +88,7 @@
 		     // Get array of data and methods
 		    $dataXml =  $composition->getData();
 		    $method  =  $composition->getMethod();
+                    
 		    // Get Daemon Job Id and Offer Id (Sii system)
 		    $daemonJobId = $composition->getDaemonJobId();
 		    $idOfferSii  = $composition->getIdOfferSii();
@@ -104,12 +102,11 @@
 		       $PostTransaction = $soapClient->__myDoRequest($strXml, $method[$key]);
 		       
 		       $parseXml = new XmlUtils();
+                       
 		       $objResponse = $parseXml->XmlToSimpleObject($PostTransaction);
 		
 		       echo "<pre>".print_r($objResponse,true)."</pre>";
-		       
-		       
-		       
+		      
 		       if($parseXml->isResponseOK($objResponse)){
 		           
 		           $idApecTransactionOk[] = $parseXml->idOfferApec;
@@ -155,8 +152,13 @@
 		                    "method"       =>   $method[$key],
 		                    "offerStatus"  =>   ""
 		           );
+                           
 		           $composition->log($arrData);
-		           
+                           
+                           if ( strstr($strXml, "FERMEE") ) {
+                              $composition->setWorkOk($daemonJobId[$key]);
+                           } 
+                           
 		       }
 		       
 		    }
@@ -205,19 +207,18 @@
 		                                         "offerStatus"  =>   (string)$statusOffer
 		                                );
 		                                $composition->log($arrData);
-		
 		                           }
-		                           
 		                 }  
 		        }
 		        $semaphore = $composition->setSemaphore(0);
 	    }else{
 	       
-	       echo "************************** ACTION NOT COMPLETED *********************************";
-		   echo "<br/>";
-		   echo "ANOTHER APPLICATION INSTANCE IS IN PROGRESS. PLEASE, YOU MUST WAIT TO FINISH IT.THANKS.";
-		   echo "<br/>";
-		   echo "*********************************************************************************";
+                echo "************************** ACTION NOT COMPLETED *********************************";
+                echo "<br/>";
+		echo "ANOTHER APPLICATION INSTANCE IS IN PROGRESS. PLEASE, YOU MUST WAIT TO FINISH IT.THANKS.";
+		echo "<br/>";
+		echo "*********************************************************************************";
+                
 	    }
     
     }catch(Exception $e){

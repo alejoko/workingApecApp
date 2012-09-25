@@ -6,7 +6,6 @@
  */
 include("mysql.php");
 
-
 class composeXml{ 
     
                 private $method = array();
@@ -19,28 +18,26 @@ class composeXml{
                 public  $trackingId;
                 
                 public function __construct($partner,$user,$pwd){
-
 			       $this->partnerId = $partner;
 			       $this->userId = $user;
 			       $this->password = $pwd;
 
 			       $this->db_query = new mySQL();
-			       
 			    } 
                 
                     
                 public function getData(){
-
+                    
                         // DATA for build authentication element
                         $md5 = md5("id1=$this->userId&id2=$this->partnerId&pass=".$this->password."eRecrutement");
                         
                         //SELECT Content
-                        $select = "SELECT ";
+                        $selectAuxSql= "SELECT ";
                         $required_date_select = array (                 
                                                                         'aux.aux_job_date as dateOfWork',
                                                                         'aux.aux_pfw_id as daemonJobId',
                                                                         'aux.aux_job_operation as operation',
-                                                                        'job.pfwid',
+                                                                        'job.pfwid as pfwid',
                                                                         'job_ref', 
                                                                         'DATE(job_expirationdate) AS job_expirationDateFormat',
                                                                         'job_profile',
@@ -54,49 +51,63 @@ class composeXml{
                                                                         'jobdomain_name',
                                                                         'jobarea_location'
                                                                    );
+                        
                         for ($i=0;$i<count($required_date_select); $i++) {
                                 if ($i==count($required_date_select)-1){ 
-                                        $select .= $required_date_select[$i].' FROM aux_pfw_job AS aux';
+                                        $selectAuxSql .= $required_date_select[$i].' FROM aux_pfw_job AS aux';
                                 }else{
-                                        $select .= $required_date_select[$i].',';
+                                        $selectAuxSql .= $required_date_select[$i].',';
                                 }
                         }
+                        
                         //LEFT JOIN Content
-                        $join = " LEFT JOIN pfw_5_job AS job ON aux.aux_job_id = job.pfwid";
-                        $join .= " LEFT JOIN pfw_5_jobdomain AS domain ON job.job_domain = domain.pfwid";
-                        $join .= " LEFT JOIN pfw_5_jobarea AS area ON job.job_area = area.pfwid";
+                        $join  = " LEFT JOIN pfw_5_job AS job ON aux.aux_job_id = job.pfwid ";
+                        $join .= " LEFT JOIN pfw_5_jobdomain AS domain ON job.job_domain = domain.pfwid ";
+                        $join .= " LEFT JOIN pfw_5_jobarea AS area ON job.job_area = area.pfwid ";
+                        
                         //WHERE Content
-                        $where = " WHERE 1";
-                        $where .= " AND aux.aux_job_flag_make = 0";
-                        $where .= " AND (DATE(job.job_expirationdate) >= DATE(NOW()))";
-                        $where .= " AND aux.aux_job_id NOT IN (SELECT aux_sii_id FROM aux_pfw_id_sii_apec WHERE aux_offer_status = 'AVALIDER')";
+                        $where  = " WHERE 1 ";
+                        $where .= " AND aux.aux_job_flag_make = 0 ";
+                        $where .= " AND ( ( DATE(job.job_expirationdate) >= DATE(NOW()) ) OR (aux.aux_job_operation='delete') ) ";
+                        $where .= " AND aux.aux_job_id NOT IN (SELECT aux_sii_id FROM aux_pfw_id_sii_apec WHERE aux_offer_status = 'AVALIDER') ";
                         $where .= " AND aux.aux_job_date <= DATE(NOW()) ";
                         
-                        ECHO "$$";
-                        ECHO $select.$join.$where."\n";
-                        ECHO "$$";
-                     
-                        $query = $this->db_query->getDataJob($select, $join, $where);  
+//                      $query = $this->db_query->getDataJob($selectAuxSql, $join, $where);
+                        
+                        $select = " SELECT aux_job_id as jobId FROM aux_pfw_job AS aux ";
+                        $group  = " GROUP BY aux_job_id ORDER BY aux_job_id ";
+                      
+                        $query = $this->db_query->getDataJob($select, $join, $where.$group);
                         
                         //XML Building
                         $requestXML = array();
 
                         while($result = $this->db_query->fetch_array($query)) {
+                           
+                           $where .= " AND aux_job_id = '".$result["jobId"]."' ORDER BY aux_pfw_id ASC";
+                           $queryAux = $this->db_query->getDataJob( $selectAuxSql , $join , $where);
+                           
+                           while($resultAux = $this->db_query->fetch_array($queryAux)) {
+                           
+                                if($auxVar=='insert'){
+                                    break;
+                                }
                             
                            $timeStamp = strtotime(date('Y-m-d H:i:s'));
                            $randTimeStamp = rand(0,$timeStamp);
                            $this->trackingId = $randTimeStamp.$timeStamp.$this->partnerId;
                            
                            // set job daemon id and offer id 
-                           $this->pushDaemonJobId($result['daemonJobId']);
-                           $this->pushIdOfferSii($result['pfwid']);
-                        
-                          $job_remuneration = substr($result['job_remuneration'], 0, 29);
-                          if(trim($result['job_remuneration'])==""){
+                           $this->pushDaemonJobId($resultAux['daemonJobId']);
+                           $this->pushIdOfferSii($resultAux['pfwid']);
+                           
+                          $job_remuneration = substr($resultAux['job_remuneration'], 0, 29);
+                          
+                          if(trim($resultAux['job_remuneration'])==""){
                                  $job_remuneration  = "variable";    
                           }
                            
-                          switch ($result['job_experience']){
+                          switch ($resultAux['job_experience']){
                                 case 3: // 0 - 2 Years
                                         $job_experience = 1;
                                         $basepay_min = 0;
@@ -119,7 +130,7 @@ class composeXml{
                                 break;  
                           }
                         
-                          switch($result['operation']){
+                          switch($resultAux['operation']){
                           	
                               case "insert":
                                   $requestType = "openPositionRequest";
@@ -127,7 +138,7 @@ class composeXml{
                                   $this->pushMethod("openPosition");
                                   // generate the id for apec SYS
                                   $timeStamp = str_replace("-", "", date('y-m-d-H-i-s') );
-                                  $idAPEC = $result['pfwid']."/".$timeStamp;
+                                  $idAPEC = $resultAux['pfwid']."/".$timeStamp;
                                   break;
                                   
                               case "delete":
@@ -136,7 +147,7 @@ class composeXml{
                                   $status = "FERMEE";
                                   $this->pushMethod("updatePositionStatus");
                                   // read the id for apec SYS
-                                  $idAPEC = $this->getApecOfferId($result['pfwid']);
+                                  $idAPEC = $this->getApecOfferId($resultAux['pfwid']);
                                   break;
                                   
                               case "suspend":
@@ -145,7 +156,7 @@ class composeXml{
                                   $status = "SUSPENDUE";
                                   $this->pushMethod("updatePositionStatus");
                                   // read the id for apec SYS
-                                  $idAPEC = $this->getApecOfferId($result['pfwid']);
+                                  $idAPEC = $this->getApecOfferId($resultAux['pfwid']);
                                   break;
                                   
                               case "publish":
@@ -154,134 +165,135 @@ class composeXml{
                                   $status = "PUBLIEE";
                                   $this->pushMethod("updatePositionStatus");
                                   // read the id for apec SYS
-                                  $idAPEC = $this->getApecOfferId($result['pfwid']);
+                                  $idAPEC = $this->getApecOfferId($resultAux['pfwid']);
                                   break;
                                   
                           }
  
                           switch($XMLBodyType){
                           	
-                              case "A":
-                                                $requestXML[] ='
-                                                    <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
-                                                      <S:Body>
-                                                          <ns2:'.$requestType.' xmlns:ns2="http://adep.apec.fr/hrxml/sep" xmlns:ns3="http://ns.hr-xml.org/2006-02-28">
+                                    case "A":
+                                                      $requestXML[] ='
+                                                          <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+                                                            <S:Body>
+                                                                <ns2:'.$requestType.' xmlns:ns2="http://adep.apec.fr/hrxml/sep" xmlns:ns3="http://ns.hr-xml.org/2006-02-28">
 
-                                                             <ns2:authentication>
-                                                                   <ns2:userId>'.$this->userId.'</ns2:userId>
-                                                                   <ns2:partnerId>'.$this->partnerId.'</ns2:partnerId>
-                                                                   <ns2:md5Key>'.$md5.'</ns2:md5Key>
-                                                            </ns2:authentication>
+                                                                   <ns2:authentication>
+                                                                         <ns2:userId>'.$this->userId.'</ns2:userId>
+                                                                         <ns2:partnerId>'.$this->partnerId.'</ns2:partnerId>
+                                                                         <ns2:md5Key>'.$md5.'</ns2:md5Key>
+                                                                  </ns2:authentication>
 
-                                                             <ns2:UniquePayloadTrackingId idOwner="CLIENT">
-                                                                 <ns3:IdValue>'.$this->trackingId.'</ns3:IdValue>
-                                                             </ns2:UniquePayloadTrackingId>
+                                                                   <ns2:UniquePayloadTrackingId idOwner="CLIENT">
+                                                                       <ns3:IdValue>'.$this->trackingId.'</ns3:IdValue>
+                                                                   </ns2:UniquePayloadTrackingId>
 
-                                                              <ns2:position>
-                                                                      <ns3:PositionSupplier relationship="self"></ns3:PositionSupplier>
-                                                                              <ns3:PositionProfile xml:lang="fr">
-                                                                                      <ns3:ProfileId idOwner="CLIENT">
-                                                                                              <ns3:IdValue>'.$idAPEC.'</ns3:IdValue>
-                                                                                      </ns3:ProfileId>
-                                                                                      <ns3:ProfileName>APEC</ns3:ProfileName>
-                                                                                      <ns3:PositionDateInfo>
-                                                                                          <ns3:StartAsSoonAsPossible>true</ns3:StartAsSoonAsPossible>
-                                                                                          <ns3:MaximumEndDate>'.$result['job_expirationDateFormat'].'</ns3:MaximumEndDate>
-                                                                                      </ns3:PositionDateInfo>
-                                                                                      <ns3:Organization>
-                                                                                              <ns3:ContactInfo>
-                                                                                                      <ns3:ContactMethod>
-                                                                                                              <ns3:InternetEmailAddress>rsuarez@sii.fr</ns3:InternetEmailAddress>
-                                                                                                              <ns3:InternetWebAddress>http://www.groupe-sii.com/fr/offres_emploi/'.$result['pfwid'].'</ns3:InternetWebAddress>
-                                                                                                      </ns3:ContactMethod>
-                                                                                              </ns3:ContactInfo>
-                                                                                      </ns3:Organization>
-                                                                                      <ns3:PositionDetail>
-                                                                                              <ns3:IndustryCode classificationName="INSEE">721Z</ns3:IndustryCode>
-                                                                                              <ns3:PhysicalLocation>
-                                                                                                      <ns3:Name>LOCATION_NAME</ns3:Name>
-                                                                                                      <ns3:Area>
-                                                                                                              <ns3:Value>'.utf8_encode($result['jobarea_location']).'</ns3:Value>
-                                                                                                      </ns3:Area>
-                                                                                              </ns3:PhysicalLocation>
-                                                                                              <ns3:PhysicalLocation>
-                                                                                                  <ns3:Name>LOCATION_CODE</ns3:Name>
-                                                                                                  <ns3:Area>
-                                                                                                      <ns3:Value>ES</ns3:Value>
-                                                                                                  </ns3:Area>
-                                                                                              </ns3:PhysicalLocation> 
-                                                                                              <ns3:PositionTitle>'.utf8_encode($result['job_title']).'</ns3:PositionTitle>
-                                                                                              <ns3:PositionClassification>Direct Hire</ns3:PositionClassification>
-                                                                                              <ns3:Competency name="GLOBAL_EXPERIENCE_LEVEL">
-                                                                                                      <ns3:CompetencyEvidence>
-                                                                                                              <ns3:StringValue>'.$job_experience.'</ns3:StringValue>
-                                                                                                      </ns3:CompetencyEvidence>
-                                                                                              </ns3:Competency>
-                                                                                              <ns3:RemunerationPackage>
-                                                                                                      <ns3:BasePay>
-                                                                                                              <ns3:BasePayAmountMin>'.$basepay_min.'</ns3:BasePayAmountMin>
-                                                                                                              <ns3:BasePayAmountMax>'.$basepay_max.'</ns3:BasePayAmountMax>
-                                                                                                      </ns3:BasePay>
-                                                                                                      <ns3:OtherPay>
-                                                                                                              <ns3:OtherPayCalculation>'.utf8_encode($job_remuneration).'</ns3:OtherPayCalculation>
-                                                                                                      </ns3:OtherPay>
-                                                                                              </ns3:RemunerationPackage>
-                                                                                      </ns3:PositionDetail>
-                                                                                      <ns3:FormattedPositionDescription>
-                                                                                              <ns3:Name>POSITION_TYPE</ns3:Name>
-                                                                                              <ns3:Value>ODD</ns3:Value>
-                                                                                      </ns3:FormattedPositionDescription>
-                                                                                      <ns3:FormattedPositionDescription>
-                                                                                              <ns3:Name>POSITION_DESCRIPTION</ns3:Name>
-                                                                                              <ns3:Value>'.utf8_encode(strip_tags($result['job_description'])).'</ns3:Value>
-                                                                                      </ns3:FormattedPositionDescription>
-                                                                                      <ns3:FormattedPositionDescription>
-                                                                                              <ns3:Name>POSITION_DISPLAY_LOGO</ns3:Name>
-                                                                                              <ns3:Value>false</ns3:Value>
-                                                                                      </ns3:FormattedPositionDescription>
-                                                                              </ns3:PositionProfile>
-                                                                              <ns3:NumberToFill>'.utf8_encode($result['job_vacancy']).'</ns3:NumberToFill>
-                                                                      </ns2:position>
-                                                                 </ns2:'.$requestType.'>
-                                                          </S:Body>
-                                                       </S:Envelope> ';	
+                                                                    <ns2:position>
+                                                                            <ns3:PositionSupplier relationship="self"></ns3:PositionSupplier>
+                                                                                    <ns3:PositionProfile xml:lang="fr">
+                                                                                            <ns3:ProfileId idOwner="CLIENT">
+                                                                                                    <ns3:IdValue>'.$idAPEC.'</ns3:IdValue>
+                                                                                            </ns3:ProfileId>
+                                                                                            <ns3:ProfileName>APEC</ns3:ProfileName>
+                                                                                            <ns3:PositionDateInfo>
+                                                                                                <ns3:StartAsSoonAsPossible>true</ns3:StartAsSoonAsPossible>
+                                                                                                <ns3:MaximumEndDate>'.$resultAux['job_expirationDateFormat'].'</ns3:MaximumEndDate>
+                                                                                            </ns3:PositionDateInfo>
+                                                                                            <ns3:Organization>
+                                                                                                    <ns3:ContactInfo>
+                                                                                                            <ns3:ContactMethod>
+                                                                                                                    <ns3:InternetEmailAddress>rsuarez@sii.fr</ns3:InternetEmailAddress>
+                                                                                                                    <ns3:InternetWebAddress>http://www.groupe-sii.com/fr/offres_emploi/'.$resultAux['pfwid'].'</ns3:InternetWebAddress>
+                                                                                                            </ns3:ContactMethod>
+                                                                                                    </ns3:ContactInfo>
+                                                                                            </ns3:Organization>
+                                                                                            <ns3:PositionDetail>
+                                                                                                    <ns3:IndustryCode classificationName="INSEE">721Z</ns3:IndustryCode>
+                                                                                                    <ns3:PhysicalLocation>
+                                                                                                            <ns3:Name>LOCATION_NAME</ns3:Name>
+                                                                                                            <ns3:Area>
+                                                                                                                    <ns3:Value>'.utf8_encode($resultAux['jobarea_location']).'</ns3:Value>
+                                                                                                            </ns3:Area>
+                                                                                                    </ns3:PhysicalLocation>
+                                                                                                    <ns3:PhysicalLocation>
+                                                                                                        <ns3:Name>LOCATION_CODE</ns3:Name>
+                                                                                                        <ns3:Area>
+                                                                                                            <ns3:Value>ES</ns3:Value>
+                                                                                                        </ns3:Area>
+                                                                                                    </ns3:PhysicalLocation> 
+                                                                                                    <ns3:PositionTitle>'.utf8_encode($resultAux['job_title']).'</ns3:PositionTitle>
+                                                                                                    <ns3:PositionClassification>Direct Hire</ns3:PositionClassification>
+                                                                                                    <ns3:Competency name="GLOBAL_EXPERIENCE_LEVEL">
+                                                                                                            <ns3:CompetencyEvidence>
+                                                                                                                    <ns3:StringValue>'.$job_experience.'</ns3:StringValue>
+                                                                                                            </ns3:CompetencyEvidence>
+                                                                                                    </ns3:Competency>
+                                                                                                    <ns3:RemunerationPackage>
+                                                                                                            <ns3:BasePay>
+                                                                                                                    <ns3:BasePayAmountMin>'.$basepay_min.'</ns3:BasePayAmountMin>
+                                                                                                                    <ns3:BasePayAmountMax>'.$basepay_max.'</ns3:BasePayAmountMax>
+                                                                                                            </ns3:BasePay>
+                                                                                                            <ns3:OtherPay>
+                                                                                                                    <ns3:OtherPayCalculation>'.utf8_encode($job_remuneration).'</ns3:OtherPayCalculation>
+                                                                                                            </ns3:OtherPay>
+                                                                                                    </ns3:RemunerationPackage>
+                                                                                            </ns3:PositionDetail>
+                                                                                            <ns3:FormattedPositionDescription>
+                                                                                                    <ns3:Name>POSITION_TYPE</ns3:Name>
+                                                                                                    <ns3:Value>ODD</ns3:Value>
+                                                                                            </ns3:FormattedPositionDescription>
+                                                                                            <ns3:FormattedPositionDescription>
+                                                                                                    <ns3:Name>POSITION_DESCRIPTION</ns3:Name>
+                                                                                                    <ns3:Value>'.utf8_encode(strip_tags($resultAux['job_description'])).'</ns3:Value>
+                                                                                            </ns3:FormattedPositionDescription>
+                                                                                            <ns3:FormattedPositionDescription>
+                                                                                                    <ns3:Name>POSITION_DISPLAY_LOGO</ns3:Name>
+                                                                                                    <ns3:Value>false</ns3:Value>
+                                                                                            </ns3:FormattedPositionDescription>
+                                                                                    </ns3:PositionProfile>
+                                                                                    <ns3:NumberToFill>'.utf8_encode($resultAux['job_vacancy']).'</ns3:NumberToFill>
+                                                                            </ns2:position>
+                                                                       </ns2:'.$requestType.'>
+                                                                </S:Body>
+                                                             </S:Envelope> ';	
 
-                              break;
+                                    break;
                               
-                              case "B":
-                                        $requestXML[] ='
-                                                   <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
-                                                        <S:Body>
+                                    case "B":
+                                              $requestXML[] ='
+                                                         <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+                                                              <S:Body>
 
-                                                          <ns2:'.$requestType.' xmlns:ns2="http://adep.apec.fr/hrxml/sep" xmlns:ns3="http://ns.hr-xml.org/2006-02-28">
+                                                                <ns2:'.$requestType.' xmlns:ns2="http://adep.apec.fr/hrxml/sep" xmlns:ns3="http://ns.hr-xml.org/2006-02-28">
 
-                                                             <ns2:authentication>
-                                                                   <ns2:userId>'.$this->userId.'</ns2:userId>
-                                                                   <ns2:partnerId>'.$this->partnerId.'</ns2:partnerId>
-                                                                   <ns2:md5Key>'.$md5.'</ns2:md5Key>
-                                                            </ns2:authentication>
+                                                                   <ns2:authentication>
+                                                                         <ns2:userId>'.$this->userId.'</ns2:userId>
+                                                                         <ns2:partnerId>'.$this->partnerId.'</ns2:partnerId>
+                                                                         <ns2:md5Key>'.$md5.'</ns2:md5Key>
+                                                                   </ns2:authentication>
 
-                                                             <ns2:UniquePayloadTrackingId idOwner="CLIENT">
-                                                                 <ns3:IdValue>'.$this->trackingId.'</ns3:IdValue>
-                                                             </ns2:UniquePayloadTrackingId>
+                                                                   <ns2:UniquePayloadTrackingId idOwner="CLIENT">
+                                                                       <ns3:IdValue>'.$this->trackingId.'</ns3:IdValue>
+                                                                   </ns2:UniquePayloadTrackingId>
 
-                                                             <ns2:clientPositionId idOwner="CLIENT">
-                                                                    <ns3:IdValue>'.$idAPEC.'</ns3:IdValue>
-                                                             </ns2:clientPositionId>
+                                                                   <ns2:clientPositionId idOwner="CLIENT">
+                                                                          <ns3:IdValue>'.$idAPEC.'</ns3:IdValue>
+                                                                   </ns2:clientPositionId>
 
-                                                             <ns2:newPositionStatus>'.$status.'</ns2:newPositionStatus>
+                                                                   <ns2:newPositionStatus>'.$status.'</ns2:newPositionStatus>
 
-                                                          </ns2:'.$requestType.'>
+                                                                </ns2:'.$requestType.'>
 
-                                                        </S:Body>
-                                                    </S:Envelope>
-                                        ';
-                              break;
-                              
+                                                              </S:Body>
+                                                          </S:Envelope>';
+                                      break;
                           }
+                          
+                          $auxVar  =  $resultAux['operation'];
+                          
                         }
-
                         return $requestXML;
+                     }
                 }
  
                 public function getMethod(){
@@ -301,7 +313,8 @@ class composeXml{
                 }
                 
                 public function getIdOfferSii(){
-                    return $this->idOfferSii; 
+//                    echo "<pre>". print_r($this->idOfferSii,true)."</pre>";
+                    return $this->idOfferSii;
                 }
                 
                 public function pushIdOfferSii($id){
@@ -313,15 +326,15 @@ class composeXml{
                     $this->db_query->query($sql);
                 }
                 
-				public function setSemaphore($value_semaphore){
+                public function setSemaphore($value_semaphore){
                     $sql="UPDATE aux_pfw_semaphore SET aux_semaphore = ".$value_semaphore;
                     $this->db_query->query($sql);
                 }
                 
                 public function getSiiOfferId($idApec){
                     $sql="SELECT  aux_sii_id FROM aux_pfw_id_sii_apec WHERE aux_apec_id='".$idApec."' limit 1";
-                    $res = $this->db_query->query($sql);
-                    $dataset=$this->db_query->fetch_array($res);
+                    $res        =   $this->db_query->query($sql);
+                    $dataset    =   $this->db_query->fetch_array($res);
                     return $dataset["aux_sii_id"];
                 }
                 
@@ -364,8 +377,7 @@ class composeXml{
                         $where .= " AND job_exportAPEC = 1";
                         $where .= " AND job_active = 1 ";
                         $where .= " AND job_expired = 0 ";
-                        $where .= " AND DATE(job_expirationdate) < NOW()";
-
+                        $where .= " AND DATE(job_expirationdate) < NOW() ";
 
                         echo $select.$join.$where."\n";
                         echo "<br/>";
@@ -378,11 +390,11 @@ class composeXml{
                         }
                 }
                 
-				public function getSemaphore(){
+		public function getSemaphore(){
 
-					$sql="SELECT aux_semaphore FROM aux_pfw_semaphore";
-                    $res = $this->db_query->query($sql);
-                    $dataset=$this->db_query->fetch_array($res);
+                    $sql="SELECT aux_semaphore FROM aux_pfw_semaphore";
+                    $res        = $this->db_query->query($sql);
+                    $dataset    = $this->db_query->fetch_array($res);
                     return $dataset["aux_semaphore"];
                     
                 }
@@ -405,20 +417,20 @@ class composeXml{
                         $method         = mysql_real_escape_string($this->toISO($arrData["method"]));
                         $offerStatus    = mysql_real_escape_string($this->toISO($arrData["offerStatus"]));
                         
-                         $sql = " INSERT INTO aux_webservice_log 
-                        (`aux_wslog_tracking_id` ,
-                        `aux_wslog_request` ,
-                        `aux_wslog_response` ,
-                        `id_task_auxTable` ,
-                        `aux_wslog_id_jobSii` ,
-                        `aux_wslog_id_jobAPEC` ,
-                        `aux_wslog_dateTime`,
-                        `aux_wslog_SOAP_ok` ,
-                        `aux_wslog_APEC_ok` ,
-                        `aux_wslog_error_code` ,
-                        `aux_wslog_error_string` ,
-                        `aux_wslog_APEC_status` ,
-                        `aux_wslog_APEC_method`,
+                        ECHO $sql = " INSERT INTO aux_webservice_log 
+                        (`aux_wslog_tracking_id`    ,
+                        `aux_wslog_request`         ,
+                        `aux_wslog_response`        ,
+                        `id_task_auxTable`          ,
+                        `aux_wslog_id_jobSii`       ,
+                        `aux_wslog_id_jobAPEC`      ,
+                        `aux_wslog_dateTime`        ,
+                        `aux_wslog_SOAP_ok`         ,
+                        `aux_wslog_APEC_ok`         ,
+                        `aux_wslog_error_code`      ,
+                        `aux_wslog_error_string`    ,
+                        `aux_wslog_APEC_status`     ,
+                        `aux_wslog_APEC_method`     ,
                         `aux_wslog_offer_status`
                         ) 
                         VALUES(
@@ -489,25 +501,25 @@ class composeXml{
                    
                }
                
-                public function getApecOfferId($idSii){
+                   public function getApecOfferId($idSii){
                     $sql="SELECT  aux_apec_id FROM aux_pfw_id_sii_apec WHERE aux_sii_id='".$idSii."' ORDER BY aux_apec_id DESC limit 1";
                     $res = $this->db_query->query($sql);
                     $dataset=$this->db_query->fetch_array($res);
                     return $dataset["aux_apec_id"];
                 }
                 
-               public function setStatusOffer($statusOffer,$idApec){
+                           public function setStatusOffer($statusOffer,$idApec){
                     $sql="UPDATE aux_pfw_id_sii_apec SET aux_offer_status= '".$statusOffer."' WHERE aux_apec_id = '".$idApec."'";
                     $this->db_query->query($sql);
                }
                
 			   public function lockTables(){
-               		$sql="LOCK TABLES aux_pfw_job WRITE";
+                    $sql="LOCK TABLES aux_pfw_job WRITE";
                     $this->db_query->query($sql);
                }
                
 			   public function unlockTables(){
-               		$sql="UNLOCK TABLES";
+                    $sql="UNLOCK TABLES";
                     $this->db_query->query($sql);
                }
     }
