@@ -82,8 +82,9 @@ class composeXml{
                             while($result = $this->db_query->fetch_array($query)) {
                                $arr_id_jobs[] = $result["jobId"];
                             }
-                        
-//                            echo "<pre>".print_r($arr_id_jobs,true)."</pre>";
+                            
+                            echo "list of offers by id to operate.";
+                            echo "<pre>".print_r($arr_id_jobs,true)."</pre>";
                             
                          foreach ($arr_id_jobs  as $idJob ){
                              
