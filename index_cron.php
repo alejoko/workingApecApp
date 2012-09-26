@@ -60,7 +60,8 @@
 		       
 		   	   $statusOffer = $objResponse->Body->getPositionStatusResponse;
                            
-		           if ( ($statusOffer instanceof SimpleXMLElement) && (strlen((string)$statusOffer)>0) ) {    
+		           if ( ($statusOffer instanceof SimpleXMLElement) && (strlen((string)$statusOffer)>0) ) { 
+                               
 		                $composition->setStatusOffer((string)$statusOffer, $idOfferApec);
 		                // log results
 		                $arrData = array(
@@ -78,6 +79,7 @@
 		                         "offerStatus"  =>   (string)$statusOffer
 		                );
 		                $composition->log($arrData);
+                                
 			   }
 		    }
 		    
