@@ -53,6 +53,7 @@
 		       $PostTransaction = $soapClient->__myDoRequest($statusRequestXml, 'getPositionStatus');
                        
 		       $parseXml = new XmlUtils();
+                       
 		       $objResponse = $parseXml->XmlToSimpleObject($PostTransaction);
 		
 		       echo "<pre>".print_r($objResponse,true)."</pre>";
@@ -60,7 +61,7 @@
 		   	   $statusOffer = $objResponse->Body->getPositionStatusResponse;
                            
 		           if ( ($statusOffer instanceof SimpleXMLElement) && (strlen((string)$statusOffer)>0) ) {    
-		               $composition->setStatusOffer((string)$statusOffer, $idOfferApec);
+		                $composition->setStatusOffer((string)$statusOffer, $idOfferApec);
 		                // log results
 		                $arrData = array(
 		                         "tracking_id"  =>   $composition->trackingId,
