@@ -24,9 +24,7 @@ class composeXml{
 			       $this->db_query = new mySQL();
 			    } 
                 
-                    
                 public function getData(){
-                    
                         // DATA for build authentication element
                         $md5 = md5("id1=$this->userId&id2=$this->partnerId&pass=".$this->password."eRecrutement");
                         
@@ -72,7 +70,7 @@ class composeXml{
                         $where .= " AND aux.aux_job_date <= DATE(NOW()) ";
                     
                         //XML Building
-                        $requestXML = array();
+                        $requestXML  = array();
                         $arr_id_jobs = array();
                         
                         $select = " SELECT aux_job_id as jobId FROM aux_pfw_job AS aux ";
@@ -91,9 +89,6 @@ class composeXml{
                            $whereAux = "  AND aux_job_id = '".$idJob."' ORDER BY aux_pfw_id ASC";
                         
                            $queryAux = $this->db_query->getDataJob( $selectAuxSql , $join , $where.$whereAux );
-                           
-                           
-//                           echo $selectAuxSql.$join.$where;
                            
                            while($resultAux = $this->db_query->fetch_array($queryAux)) {
                                
@@ -295,11 +290,8 @@ class composeXml{
                                                           </S:Envelope>';
                                       break;
                           }
-                          
-                          $auxVar  =  $resultAux['operation'];
-                          
+                          $auxVar  =  $resultAux['operation']; 
                         }
-                      
                      }
                        return $requestXML;
                 }
@@ -424,7 +416,7 @@ class composeXml{
                         $method         = mysql_real_escape_string($this->toISO($arrData["method"]));
                         $offerStatus    = mysql_real_escape_string($this->toISO($arrData["offerStatus"]));
                         
-                        echo $sql = " INSERT INTO aux_webservice_log 
+                         $sql = " INSERT INTO aux_webservice_log 
                         (`aux_wslog_tracking_id`    ,
                         `aux_wslog_request`         ,
                         `aux_wslog_response`        ,

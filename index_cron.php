@@ -1,4 +1,5 @@
 <?php  
+
     error_reporting(E_ERROR & ~E_COMPILE_ERROR);
     
     require_once "config.php";
@@ -12,6 +13,7 @@
     set_time_limit(TIME_SCRIPT_EXECUTION_LIMIT);
     
     $endpoint = ENDPOINT;    
+    
     header('Content-Type: text/html; charset=UTF-8');
  
     $composition = new composeXml( PARTNERID , USERID , PASSWORD ); 
@@ -41,7 +43,7 @@
 		    $offerAValidee = $composition->getApecOfferAValidee();
                     
 		  foreach ($offerAValidee as $result) {
-		       	
+                      
 		   $idOfferApec = $result['aux_apec_id'];
 		 
 		    $statusRequestXml = $composition->getStatusXml($idOfferApec); 
@@ -85,7 +87,7 @@
 		    
 		   $composition = new composeXml( PARTNERID, USERID, PASSWORD ); 
 		        
-		     // Get array of data and methods
+		    // Get array of data and methods
 		    $dataXml =  $composition->getData();
 		    $method  =  $composition->getMethod();
                     
