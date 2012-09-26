@@ -14,7 +14,7 @@
     $endpoint = ENDPOINT;    
     header('Content-Type: text/html; charset=UTF-8');
  
-    $composition = new composeXml( PARTNERID, USERID, PASSWORD ); 
+    $composition = new composeXml( PARTNERID , USERID , PASSWORD ); 
 
     try{
     	

@@ -21,7 +21,6 @@ class composeXml{
 			       $this->partnerId = $partner;
 			       $this->userId = $user;
 			       $this->password = $pwd;
-
 			       $this->db_query = new mySQL();
 			    } 
                 
@@ -71,28 +70,36 @@ class composeXml{
                         $where .= " AND ( ( DATE(job.job_expirationdate) >= DATE(NOW()) ) OR (aux.aux_job_operation='delete') ) ";
                         $where .= " AND aux.aux_job_id NOT IN (SELECT aux_sii_id FROM aux_pfw_id_sii_apec WHERE aux_offer_status = 'AVALIDER') ";
                         $where .= " AND aux.aux_job_date <= DATE(NOW()) ";
-                        
-//                      $query = $this->db_query->getDataJob($selectAuxSql, $join, $where);
+                    
+                        //XML Building
+                        $requestXML = array();
+                        $arr_id_jobs = array();
                         
                         $select = " SELECT aux_job_id as jobId FROM aux_pfw_job AS aux ";
                         $group  = " GROUP BY aux_job_id ORDER BY aux_job_id ";
-                      
-                        $query = $this->db_query->getDataJob($select, $join, $where.$group);
+                        $query  = $this->db_query->getDataJob($select, $join, $where.$group);
                         
-                        //XML Building
-                        $requestXML = array();
-
-                        while($result = $this->db_query->fetch_array($query)) {
+                            while($result = $this->db_query->fetch_array($query)) {
+                               $arr_id_jobs[] = $result["jobId"];
+                            }
+                        
+//                            echo "<pre>".print_r($arr_id_jobs,true)."</pre>";
+                            
+                         foreach ($arr_id_jobs  as $idJob ){
+                             
+                           $whereAux = "  AND aux_job_id = '".$idJob."' ORDER BY aux_pfw_id ASC";
+                        
+                           $queryAux = $this->db_query->getDataJob( $selectAuxSql , $join , $where.$whereAux );
                            
-                           $where .= " AND aux_job_id = '".$result["jobId"]."' ORDER BY aux_pfw_id ASC";
-                           $queryAux = $this->db_query->getDataJob( $selectAuxSql , $join , $where);
+                           
+//                           echo $selectAuxSql.$join.$where;
                            
                            while($resultAux = $this->db_query->fetch_array($queryAux)) {
-                           
+                               
                                 if($auxVar=='insert'){
                                     break;
                                 }
-                            
+    
                            $timeStamp = strtotime(date('Y-m-d H:i:s'));
                            $randTimeStamp = rand(0,$timeStamp);
                            $this->trackingId = $randTimeStamp.$timeStamp.$this->partnerId;
@@ -167,7 +174,6 @@ class composeXml{
                                   // read the id for apec SYS
                                   $idAPEC = $this->getApecOfferId($resultAux['pfwid']);
                                   break;
-                                  
                           }
  
                           switch($XMLBodyType){
@@ -292,8 +298,9 @@ class composeXml{
                           $auxVar  =  $resultAux['operation'];
                           
                         }
-                        return $requestXML;
+                      
                      }
+                       return $requestXML;
                 }
  
                 public function getMethod(){
@@ -313,7 +320,6 @@ class composeXml{
                 }
                 
                 public function getIdOfferSii(){
-//                    echo "<pre>". print_r($this->idOfferSii,true)."</pre>";
                     return $this->idOfferSii;
                 }
                 
@@ -371,9 +377,9 @@ class composeXml{
                       
                         $this->db_query = new mySQL();	
                         
-                        $select =" SELECT pfwid as id FROM pfw_5_job ";
-                        $join = "";
-                        $where = " WHERE 1";
+                        $select = " SELECT pfwid as id FROM pfw_5_job ";
+                        $join   = " ";
+                        $where  = " WHERE 1";
                         $where .= " AND job_exportAPEC = 1";
                         $where .= " AND job_active = 1 ";
                         $where .= " AND job_expired = 0 ";
@@ -417,7 +423,7 @@ class composeXml{
                         $method         = mysql_real_escape_string($this->toISO($arrData["method"]));
                         $offerStatus    = mysql_real_escape_string($this->toISO($arrData["offerStatus"]));
                         
-                        ECHO $sql = " INSERT INTO aux_webservice_log 
+                        echo $sql = " INSERT INTO aux_webservice_log 
                         (`aux_wslog_tracking_id`    ,
                         `aux_wslog_request`         ,
                         `aux_wslog_response`        ,
@@ -508,17 +514,17 @@ class composeXml{
                     return $dataset["aux_apec_id"];
                 }
                 
-                           public function setStatusOffer($statusOffer,$idApec){
+                   public function setStatusOffer($statusOffer,$idApec){
                     $sql="UPDATE aux_pfw_id_sii_apec SET aux_offer_status= '".$statusOffer."' WHERE aux_apec_id = '".$idApec."'";
                     $this->db_query->query($sql);
                }
-               
-			   public function lockTables(){
+                    
+                   public function lockTables(){
                     $sql="LOCK TABLES aux_pfw_job WRITE";
                     $this->db_query->query($sql);
                }
                
-			   public function unlockTables(){
+                   public function unlockTables(){
                     $sql="UNLOCK TABLES";
                     $this->db_query->query($sql);
                }
