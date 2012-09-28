@@ -28,7 +28,6 @@ class mySQL{
          }
   
  	public function getDataJob($select, $join, $where){  
-
  		$query = $select.''. $join.''.$where;
 
  		$result = mysql_query($query,$this->conexion);  

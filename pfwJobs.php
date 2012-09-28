@@ -348,8 +348,20 @@ class composeXml{
                 }
          
                 public function setWorkOk($TableAuxJobId){ 
-                    $sql = "UPDATE aux_pfw_job SET aux_job_flag_make=1 WHERE aux_pfw_id='".$TableAuxJobId."'";
+                    echo $sql = "UPDATE aux_pfw_job SET aux_job_flag_make=1 WHERE aux_pfw_id='".$TableAuxJobId."'";
                     $this->db_query->query($sql);
+                    
+                    echo $sql = "SELECT aux_job_id FROM aux_pfw_job WHERE aux_pfw_id='".$TableAuxJobId."' AND aux_job_operation='delete' LIMIT 1";
+                    $res = $this->db_query->query($sql);
+                    while($resArr = $this->db_query->fetch_array($res)) {
+                        $result[] = $resArr;
+                    }
+                    
+                    if (count($result)>0){
+                        echo $sql = "UPDATE pfw_5_job SET job_expired=1 WHERE pfwid=".$result["aux_job_id"]." AND DATE(job_expirationdate) < DATE(NOW()) ";
+                        $res = $this->db_query->query($sql); 
+                    }
+                   
                 }
            
                 public function openSameOfferOneMonth($idSii){
@@ -376,17 +388,18 @@ class composeXml{
                         $where .= " AND job_exportAPEC = 1";
                         $where .= " AND job_active = 1 ";
                         $where .= " AND job_expired = 0 ";
-                        $where .= " AND DATE(job_expirationdate) < NOW() ";
+                        $where .= " AND DATE(job_expirationdate) < DATE(NOW()) ";
 
                         echo $select.$join.$where."\n";
                         echo "<br/>";
                         
-                        $query = $this->db_query->getDataJob($select, $join, $where); 
-                        
+                        $query = $this->db_query->getDataJob($select, $join, $where);
                         while($result = $this->db_query->fetch_array($query)) {
                             $sql = " INSERT INTO aux_pfw_job (aux_job_id,  aux_job_date, aux_job_time, aux_job_flag_make, aux_job_operation) VALUES(".$result["id"]." , DATE(NOW()), TIME(NOW()), 0, 'delete')";
                             $this->db_query->query($sql);
                         }
+                        
+                        
                 }
                 
 		public function getSemaphore(){
