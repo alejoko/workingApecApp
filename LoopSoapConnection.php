@@ -38,9 +38,7 @@ class LoopSoapConnection{
                     $composition = new composeXml(
                                 PARTNERID,
                                 USERID,
-                                PASSWORD,
-                                INIDATE,
-                                ENDDATE
+                                PASSWORD
                             ); 
                     
                     $semaphore = $composition->setSemaphore(0);
