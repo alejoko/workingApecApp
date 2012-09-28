@@ -351,14 +351,14 @@ class composeXml{
                     echo $sql = "UPDATE aux_pfw_job SET aux_job_flag_make=1 WHERE aux_pfw_id='".$TableAuxJobId."'";
                     $this->db_query->query($sql);
                     
+                    $result = array();
+                    
                     echo $sql = "SELECT aux_job_id FROM aux_pfw_job WHERE aux_pfw_id='".$TableAuxJobId."' AND aux_job_operation='delete' LIMIT 1";
                     $res = $this->db_query->query($sql);
-                    while($resArr = $this->db_query->fetch_array($res)) {
-                        $result[] = $resArr;
-                    }
-                    
-                    if (count($result)>0){
-                        echo $sql = "UPDATE pfw_5_job SET job_expired=1 WHERE pfwid=".$result["aux_job_id"]." AND DATE(job_expirationdate) < DATE(NOW()) ";
+                    $resArr = $this->db_query->fetch_array($res);
+                       
+                    if (count($resArr)>0){
+                        echo $sql = "UPDATE pfw_5_job SET job_expired=1 WHERE pfwid='".$resArr["aux_job_id"]."' AND DATE(job_expirationdate) < DATE(NOW()) ";
                         $res = $this->db_query->query($sql); 
                     }
                    

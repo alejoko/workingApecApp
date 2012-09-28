@@ -42,8 +42,8 @@
  * end environment vars    
  */
     // Defined number of attempts of connection and number of seconds between attempts
-    define('SOAP_CONNNECTION_ATTEMPS',5);
-    define('SECONDS_BETWEEN_ATTEMPS',300);
+    define('SOAP_CONNNECTION_ATTEMPS',30);
+    define('SECONDS_BETWEEN_ATTEMPS',6);
     
     define('SECONDS_SLEEP_AND_CHECK',90);
     define('TIME_SCRIPT_EXECUTION_LIMIT',2000);
