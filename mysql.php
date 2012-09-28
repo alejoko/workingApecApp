@@ -22,7 +22,7 @@ class mySQL{
                 $resultado = mysql_query($consulta,$this->conexion);
                 if(!$resultado){ 
                   echo 'MySQL Error: ' . mysql_error();
-                  exit;
+                  throw new Exception (sprintf ("MySQL.Error(%d): %s", mysql_errno (), mysql_error ()));
                 }
                 return $resultado;
          }
@@ -33,7 +33,7 @@ class mySQL{
  		$result = mysql_query($query,$this->conexion);  
   		if(!$result){  
   			echo 'mySQL Error: ' . mysql_error();  
-  			exit;  
+                        throw new Exception (sprintf ("MySQL.Error(%d): %s", mysql_errno (), mysql_error ()));
   		}  
   		return $result;   
   	}  
