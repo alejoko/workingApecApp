@@ -22,6 +22,7 @@ class composeXml{
 			       $this->userId = $user;
 			       $this->password = $pwd;
 			       $this->db_query = new mySQL();
+                               $this->db_query->query("SET SESSION wait_timeout = 6000");
 			    } 
                 
                 public function getData(){
@@ -34,7 +35,7 @@ class composeXml{
                                                                         'aux.aux_job_date as dateOfWork',
                                                                         'aux.aux_pfw_id as daemonJobId',
                                                                         'aux.aux_job_operation as operation',
-                                                                        'job.pfwid as pfwid',
+                                                                        'aux.aux_job_id as pfwid',
                                                                         'job_ref', 
                                                                         'DATE(job_expirationdate) AS job_expirationDateFormat',
                                                                         'job_profile',
@@ -85,17 +86,17 @@ class composeXml{
                             echo "<pre>".print_r($arr_id_jobs,true)."</pre>";
                             
                          foreach ($arr_id_jobs  as $idJob ){
-                             
+                           $auxVar=""; 
                            $whereAux = "  AND aux_job_id = '".$idJob."' ORDER BY aux_pfw_id ASC";
-                        
                            $queryAux = $this->db_query->getDataJob( $selectAuxSql , $join , $where.$whereAux );
+                           echo $selectAuxSql.$join.$where.$whereAux;
                            
-                           while($resultAux = $this->db_query->fetch_array($queryAux)) {
+                           while( $resultAux = $this->db_query->fetch_array($queryAux) ) {
                                
                                 if($auxVar=='insert'){
                                     break;
                                 }
-    
+                                    
                            $timeStamp = strtotime(date('Y-m-d H:i:s'));
                            $randTimeStamp = rand(0,$timeStamp);
                            $this->trackingId = $randTimeStamp.$timeStamp.$this->partnerId;
@@ -514,7 +515,7 @@ class composeXml{
                }
                
                    public function getApecOfferId($idSii){
-                    $sql="SELECT  aux_apec_id FROM aux_pfw_id_sii_apec WHERE aux_sii_id='".$idSii."' ORDER BY aux_apec_id DESC limit 1";
+                   echo $sql="SELECT  aux_apec_id FROM aux_pfw_id_sii_apec WHERE aux_sii_id='".$idSii."' ORDER BY aux_apec_id DESC limit 1";
                     $res = $this->db_query->query($sql);
                     $dataset=$this->db_query->fetch_array($res);
                     return $dataset["aux_apec_id"];

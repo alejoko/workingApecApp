@@ -10,7 +10,6 @@
     define('DB_USERNAME', 'siiuser');
     define('DB_PASSWORD', 'user00');
     define('DB_DATABASE', 'pfwecm');
-    
       
     // Defined TEST values. These values must change in PROD
     define( 'PARTNERID', '277');
@@ -25,7 +24,8 @@
 /**
  * prod environment vars    
  */
-//    define('DB_HOSTNAME', '81.252.236.86');
+    
+//    define('DB_HOSTNAME', 'localhost');
 //    define('DB_USERNAME', 'pfwuser');
 //    define('DB_PASSWORD', 'user00');
 //    define('DB_DATABASE', 'pfw');
