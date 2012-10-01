@@ -89,7 +89,7 @@ class composeXml{
                            $auxVar=""; 
                            $whereAux = "  AND aux_job_id = '".$idJob."' ORDER BY aux_pfw_id ASC";
                            $queryAux = $this->db_query->getDataJob( $selectAuxSql , $join , $where.$whereAux );
-                           echo $selectAuxSql.$join.$where.$whereAux;
+                            $selectAuxSql.$join.$where.$whereAux;
                            
                            while( $resultAux = $this->db_query->fetch_array($queryAux) ) {
                                
@@ -349,17 +349,17 @@ class composeXml{
                 }
          
                 public function setWorkOk($TableAuxJobId){ 
-                    echo $sql = "UPDATE aux_pfw_job SET aux_job_flag_make=1 WHERE aux_pfw_id='".$TableAuxJobId."'";
+                     $sql = "UPDATE aux_pfw_job SET aux_job_flag_make=1 WHERE aux_pfw_id='".$TableAuxJobId."'";
                     $this->db_query->query($sql);
                     
                     $result = array();
                     
-                    echo $sql = "SELECT aux_job_id FROM aux_pfw_job WHERE aux_pfw_id='".$TableAuxJobId."' AND aux_job_operation='delete' LIMIT 1";
+                     $sql = "SELECT aux_job_id FROM aux_pfw_job WHERE aux_pfw_id='".$TableAuxJobId."' AND aux_job_operation='delete' LIMIT 1";
                     $res = $this->db_query->query($sql);
                     $resArr = $this->db_query->fetch_array($res);
                        
                     if (count($resArr)>0){
-                        echo $sql = "UPDATE pfw_5_job SET job_expired=1 WHERE pfwid='".$resArr["aux_job_id"]."' AND DATE(job_expirationdate) < DATE(NOW()) ";
+                         $sql = "UPDATE pfw_5_job SET job_expired=1 WHERE pfwid='".$resArr["aux_job_id"]."' AND DATE(job_expirationdate) < DATE(NOW()) ";
                         $res = $this->db_query->query($sql); 
                     }
                    
@@ -391,8 +391,8 @@ class composeXml{
                         $where .= " AND job_expired = 0 ";
                         $where .= " AND DATE(job_expirationdate) < DATE(NOW()) ";
 
-                        echo $select.$join.$where."\n";
-                        echo "<br/>";
+                         $select.$join.$where."\n";
+                        //"<br/>";
                         
                         $query = $this->db_query->getDataJob($select, $join, $where);
                         while($result = $this->db_query->fetch_array($query)) {
@@ -515,7 +515,7 @@ class composeXml{
                }
                
                    public function getApecOfferId($idSii){
-                   echo $sql="SELECT  aux_apec_id FROM aux_pfw_id_sii_apec WHERE aux_sii_id='".$idSii."' ORDER BY aux_apec_id DESC limit 1";
+                    $sql="SELECT  aux_apec_id FROM aux_pfw_id_sii_apec WHERE aux_sii_id='".$idSii."' ORDER BY aux_apec_id DESC limit 1";
                     $res = $this->db_query->query($sql);
                     $dataset=$this->db_query->fetch_array($res);
                     return $dataset["aux_apec_id"];
