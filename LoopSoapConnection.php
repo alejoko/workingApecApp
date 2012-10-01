@@ -26,6 +26,7 @@ class LoopSoapConnection{
                    ); 
                    var_dump($soapClient);
                    var_dump( get_resource_type($soapClient->sdl) );
+                   echo "<h2>SOAP connection succesfull</h2>";
                    return $soapClient;
              
             } catch (Exception $e) {
@@ -78,6 +79,7 @@ class LoopSoapConnection{
                     return false; // important!!: return breaks the loop!
                     
                 }
+                echo "<h2>Retrying SOAP connection!</h2>";
                 sleep($this->sleep);
                 $i++;
                 
