@@ -205,7 +205,7 @@ class composeXml{
                                                                                             <ns3:Organization>
                                                                                                     <ns3:ContactInfo>
                                                                                                             <ns3:ContactMethod>
-                                                                                                                    <ns3:InternetEmailAddress>rsuarez@sii.fr</ns3:InternetEmailAddress>
+                                                                                                                    <ns3:InternetEmailAddress>'.MAIL_SEND_INFO.'</ns3:InternetEmailAddress>
                                                                                                                     <ns3:InternetWebAddress>http://www.groupe-sii.com/fr/offres_emploi/'.$resultAux['pfwid'].'</ns3:InternetWebAddress>
                                                                                                             </ns3:ContactMethod>
                                                                                                     </ns3:ContactInfo>
