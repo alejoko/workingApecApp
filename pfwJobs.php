@@ -251,8 +251,13 @@ class composeXml{
                                                                                             </ns3:FormattedPositionDescription>
                                                                                             <ns3:FormattedPositionDescription>
                                                                                                     <ns3:Name>POSITION_DISPLAY_LOGO</ns3:Name>
-                                                                                                    <ns3:Value>false</ns3:Value>
+                                                                                                    <ns3:Value>true</ns3:Value>
                                                                                             </ns3:FormattedPositionDescription>
+                                                                                            <ns3:HowToApply>
+                                                                                                <ns3:ApplicationMethod>
+                                                                                                  <ns3:InternetWebAddress>http://www.groupe-sii.com/fr/offres_emploi/'.$resultAux['pfwid'].'</ns3:InternetWebAddress>            
+                                                                                                </ns3:ApplicationMethod>
+                                                                                            </ns3:HowToApply>
                                                                                     </ns3:PositionProfile>
                                                                                     <ns3:NumberToFill>'.utf8_encode($resultAux['job_vacancy']).'</ns3:NumberToFill>
                                                                             </ns2:position>
