@@ -161,6 +161,7 @@
 		           $composition->log($arrData);
                            
                            if ( strstr($strXml, "FERMEE") ) {
+                               echo "----FERMME---WORK OK";
                               $composition->setWorkOk($daemonJobId[$key]);
                            } 
                            

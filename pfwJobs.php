@@ -36,16 +36,17 @@ class composeXml{
                                                                         'aux.aux_pfw_id as daemonJobId',
                                                                         'aux.aux_job_operation as operation',
                                                                         'aux.aux_job_id as pfwid',
+                                                                        'area.jobarea_introductory as intro',
                                                                         'job_ref', 
                                                                         'DATE(job_expirationdate) AS job_expirationDateFormat',
                                                                         'job_profile',
                                                                         'job_expirationdate',
                                                                         'job_title', 
-                                                                        'job_description',
+                                                                        'job_description as description', 
+                                                                        'job_profile as areaProfile',
                                                                         'job_remuneration',
                                                                         'job_experience',
-                                                                        'job_vacancy',
-                                                                        'jobdomain_codactivity',
+                                                                        'jobdomain_codactivity',// see job_category
                                                                         'jobdomain_name',
                                                                         'jobarea_location'
                                                                    );
@@ -247,7 +248,13 @@ class composeXml{
                                                                                             </ns3:FormattedPositionDescription>
                                                                                             <ns3:FormattedPositionDescription>
                                                                                                     <ns3:Name>POSITION_DESCRIPTION</ns3:Name>
-                                                                                                    <ns3:Value>'.utf8_encode(strip_tags($resultAux['job_description'])).'</ns3:Value>
+                                                                                                    <ns3:Value>'
+                                                                                                        .utf8_encode(strip_tags($resultAux['intro'])).'
+                                                                                                            
+                                                                                                       '.utf8_encode(strip_tags($resultAux['description'])).'
+                                                                                                           
+                                                                                                       '.utf8_encode(strip_tags($resultAux['areaProfile']))
+                                                                                                    .'</ns3:Value>
                                                                                             </ns3:FormattedPositionDescription>
                                                                                             <ns3:FormattedPositionDescription>
                                                                                                     <ns3:Name>POSITION_DISPLAY_LOGO</ns3:Name>
@@ -259,7 +266,7 @@ class composeXml{
                                                                                                 </ns3:ApplicationMethod>
                                                                                             </ns3:HowToApply>
                                                                                     </ns3:PositionProfile>
-                                                                                    <ns3:NumberToFill>'.utf8_encode($resultAux['job_vacancy']).'</ns3:NumberToFill>
+                                                                                    <ns3:NumberToFill>1</ns3:NumberToFill>
                                                                             </ns2:position>
                                                                        </ns2:'.$requestType.'>
                                                                 </S:Body>
@@ -359,12 +366,16 @@ class composeXml{
                     
                     $result = array();
                     
-                     $sql = "SELECT aux_job_id FROM aux_pfw_job WHERE aux_pfw_id='".$TableAuxJobId."' AND aux_job_operation='delete' LIMIT 1";
+                    // si la tarea REALIZADA es un delete y ademas la oferta esta expirada ponemos el flag job_expired a uno
+                     $sql = "SELECT jobTable.pfwid as jobOfferId FROM aux_pfw_job as taskTable
+                    INNER JOIN pfw_5_job as jobTable ON jobTable.pfwid =  taskTable.aux_job_id 
+                    WHERE aux_pfw_id='".$TableAuxJobId."' AND aux_job_operation='delete'
+                    AND DATE(jobTable.job_expirationdate) < DATE(NOW())  LIMIT 1";
                     $res = $this->db_query->query($sql);
                     $resArr = $this->db_query->fetch_array($res);
-                       
+                    
                     if (count($resArr)>0){
-                         $sql = "UPDATE pfw_5_job SET job_expired=1 WHERE pfwid='".$resArr["aux_job_id"]."' AND DATE(job_expirationdate) < DATE(NOW()) ";
+                          $sql = "UPDATE aux_pfw_id_sii_apec SET job_expired=1 WHERE aux_sii_id='".$resArr["jobOfferId"]."' ";
                         $res = $this->db_query->query($sql); 
                     }
                    
@@ -388,24 +399,23 @@ class composeXml{
                       
                         $this->db_query = new mySQL();	
                         
-                        $select = " SELECT pfwid as id FROM pfw_5_job ";
-                        $join   = " ";
+                        $select = " SELECT pfwid as id FROM pfw_5_job as jobTable";
+                        $join   = " LEFT JOIN aux_pfw_id_sii_apec as idTable ON idTable.aux_sii_id = jobTable.pfwid";
                         $where  = " WHERE 1";
-                        $where .= " AND job_exportAPEC = 1";
-                        $where .= " AND job_active = 1 ";
-                        $where .= " AND job_expired = 0 ";
-                        $where .= " AND DATE(job_expirationdate) < DATE(NOW()) ";
+                        $where .= " AND jobTable.job_exportAPEC = 1";
+                        $where .= " AND jobTable.job_active = 1 ";
+                        $where .= " AND idTable.job_expired = 0 "; // NO REPITAMOS OFFERTAS QUE YA HEMOS BORRADO POR ESTAR EXPIRADAS
+                        $where .= " AND DATE(jobTable.job_expirationdate) < DATE(NOW()) ";
 
-                         $select.$join.$where."\n";
+                        ECHO  $select.$join.$where."\n";
                         //"<br/>";
                         
                         $query = $this->db_query->getDataJob($select, $join, $where);
                         while($result = $this->db_query->fetch_array($query)) {
-                            $sql = " INSERT INTO aux_pfw_job (aux_job_id,  aux_job_date, aux_job_time, aux_job_flag_make, aux_job_operation) VALUES(".$result["id"]." , DATE(NOW()), TIME(NOW()), 0, 'delete')";
+                            $sql = " INSERT INTO aux_pfw_job (aux_job_id,  aux_job_date, aux_job_time, aux_job_flag_make, aux_job_operation, aux_job_trigger_sentence) VALUES(".$result["id"]." , DATE(NOW()), TIME(NOW()), 0, 'delete', 'offer expired')";
                             $this->db_query->query($sql);
                         }
-                        
-                        
+     
                 }
                 
 		public function getSemaphore(){
