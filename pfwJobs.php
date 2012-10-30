@@ -249,11 +249,9 @@ class composeXml{
                                                                                             <ns3:FormattedPositionDescription>
                                                                                                     <ns3:Name>POSITION_DESCRIPTION</ns3:Name>
                                                                                                     <ns3:Value>'
-                                                                                                        .utf8_encode(strip_tags($resultAux['intro'])).'
-                                                                                                            
-                                                                                                       '.utf8_encode(strip_tags($resultAux['description'])).'
-                                                                                                           
-                                                                                                       '.utf8_encode(strip_tags($resultAux['areaProfile']))
+                                                                                                            .utf8_encode(strip_tags($resultAux['intro']))." "
+                                                                                                            .utf8_encode(strip_tags($resultAux['description']))." "
+                                                                                                            .utf8_encode(strip_tags($resultAux['areaProfile']))
                                                                                                     .'</ns3:Value>
                                                                                             </ns3:FormattedPositionDescription>
                                                                                             <ns3:FormattedPositionDescription>

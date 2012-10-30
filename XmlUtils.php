@@ -31,32 +31,44 @@ Class XmlUtils {
     public function isResponseOK($SoapResponseObj){
          //TODO: code separate functions for different response request like
          //openPositionResponse or updatePositionResponse
+            
+             if($SoapResponseObj->Body){
+                  $objRequest = $SoapResponseObj->Body->children();
+             } else {
+                 return false;
+             }
+             
+            // all ok Next Step parse response.
+            
+                if($objRequest instanceof SimpleXMLElement){
+
+                            if($objRequest->children()->PayloadDisposition->EntityDisposition instanceof SimpleXMLElement){
+                                   $objAux = $objRequest->children()->PayloadDisposition->EntityDisposition;
+                                   $this->trackingId = $objRequest->children()->PayloadResponseSummary->UniquePayloadTrackingId->IdValue;
+
+                                   if((string)$objAux->EntityNoException == "true"){
+                                            $this->idOfferApec= $objAux->EntityIdentifier->IdValue;
+                                            return true;
+                                       } else {
+                                            $this->ApecErrorCode = $objAux->EntityException->Exception->ExceptionIdentifier;
+                                            return false;
+                                       }
+                           } else {
+                                            if($objRequest->children()->Fault instanceof SimpleXMLElement){
+                                                $this->ApecErrorStr = (string)$objRequest->children()->Fault->faultstring;
+                                                echo $this->ApecErrorStr;
+                                            }
+                                            return false;
+                           }
+
+                           //TODO: read error code or string of fault object (not method exception)
+                } else {
+                      return false;
+                }
         
-        if($SoapResponseObj->Body->children() instanceof SimpleXMLElement){
-                $objRequest = $SoapResponseObj->Body->children();
-                    if($objRequest->children()->PayloadDisposition->EntityDisposition instanceof SimpleXMLElement){
-                           $objAux = $objRequest->children()->PayloadDisposition->EntityDisposition;
-                           $this->trackingId = $objRequest->children()->PayloadResponseSummary->UniquePayloadTrackingId->IdValue;
-                           
-                           if((string)$objAux->EntityNoException == "true"){
-                                    $this->idOfferApec= $objAux->EntityIdentifier->IdValue;
-                                    return true;
-                               } else {
-                                    $this->ApecErrorCode = $objAux->EntityException->Exception->ExceptionIdentifier;
-                                    return false;
-                               }
-                   } else {
-                                    if($objRequest->children()->Fault instanceof SimpleXMLElement){
-                                        $this->ApecErrorStr = (string)$objRequest->children()->Fault->faultstring;
-                                        echo $this->ApecErrorStr;
-                                    }
-                                    return false;
-                   }
-                   
-                   //TODO: read error code or string of fault object (not method exception)
-        } else {
-              return false;
-        }
+   
+    
+
         
     }
 }

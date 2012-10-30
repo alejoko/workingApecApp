@@ -231,7 +231,25 @@
 
     	$semaphore = $composition->setSemaphore(0);
         echo $e->getMessage(); 
-    	
+        $composition = new composeXml( PARTNERID , USERID , PASSWORD ); 
+                         // Log the last request without xml and html tags and the php or sql error that produce the request
+		           $arrData = array(
+		                    "tracking_id"  =>   $parseXml->trackingId,
+		                    "request"      =>   "",
+		                    "response"     =>   "",
+		                    "daemonTaskId" =>   $daemonJobId[$key],
+		                    "idSii"        =>   $idOfferSii[$key],
+		                    "idApec"       =>   $composition->getApecOfferId($idOfferSii[$key]),
+		                    "SOAPOK"       =>   0,
+		                    "APECOK"       =>   0,
+		                    "errorCode"    =>   "9999",
+		                    "errorString"  =>   $e->getMessage(),
+		                    "method"       =>   $method[$key],
+		                    "offerStatus"  =>   ""
+		           );
+                           
+		           $composition->log($arrData);
+
     }
 
   
