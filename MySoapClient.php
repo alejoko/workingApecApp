@@ -4,7 +4,6 @@ class MySoapClient extends SoapClient {
 
 	function __construct($wsdl, $options) {
 		parent::__construct($wsdl, $options);
-		$this->server = new SoapServer($wsdl, $options);
 	}
 	public function __doRequest($request, $location, $action, $version) 
 	{ 

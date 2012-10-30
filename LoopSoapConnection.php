@@ -24,6 +24,9 @@ class LoopSoapConnection{
                        'encoding'       => ENCODING
                        )
                    ); 
+                   var_dump($soapClient);
+                   var_dump( get_resource_type($soapClient->sdl) );
+                   echo "<h2>SOAP connection succesfull</h2>";
                    return $soapClient;
              
             } catch (Exception $e) {
@@ -32,6 +35,14 @@ class LoopSoapConnection{
                 echo "<h2>Exception Error!</h2>"; 
                 echo $e->getMessage(); 
                 if ($i==$this->attempts){
+                
+                    $composition = new composeXml(
+                                PARTNERID,
+                                USERID,
+                                PASSWORD
+                            ); 
+                    
+                    $semaphore = $composition->setSemaphore(0);
                     
                     $subject = "APEC SOAP PROCESS FAIL!";
                     $message = "
@@ -42,16 +53,12 @@ class LoopSoapConnection{
                     $send = $mail->send();
                     if($send){
                             print "SOAP process fail: an email has been sent to managers";
+                            echo "<br/>";
                         } else {
                             print "SOAP process fail! And is impossible to delivery an email by SMTP!!"; 
+                            echo "<br/>";
                         }
-                    
-                   $composition = new composeXml(
-                                PARTNERID,
-                                USERID,
-                                PASSWORD
-                            ); 
-                            
+                     
                     // log results:
                     $arrData = array(
                              "tracking_id"  =>   '',
@@ -62,17 +69,19 @@ class LoopSoapConnection{
                              "idApec"       =>   '0',
                              "SOAPOK"       =>   0,
                              "APECOK"       =>   0,
-                             "errorCode"    =>   'Impoible launch SOAP WSDL',
+                             "errorCode"    =>   'Imposible launch SOAP WSDL',
                              "errorString"  =>   $e->getMessage(),
-                             "method"       =>   ''
+                             "method"       =>   '',
+                             "offerStatus"  =>   ''
                     );
                     $composition->log($arrData);
-           
+                    throw $e;
                     return false; // important!!: return breaks the loop!
                     
                 }
+                echo "<h2>Retrying SOAP connection!</h2>";
                 sleep($this->sleep);
-                ++$i;
+                $i++;
                 
             }   
 

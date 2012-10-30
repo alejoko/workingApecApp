@@ -21,20 +21,17 @@ class mySQL{
                 $this->total_consultas++; 
                 $resultado = mysql_query($consulta,$this->conexion);
                 if(!$resultado){ 
-                  echo 'MySQL Error: ' . mysql_error();
-                  exit;
+                        throw new Exception (sprintf ("MySQL.Error(%d): %s", mysql_errno (), mysql_error ()));
                 }
                 return $resultado;
          }
   
  	public function getDataJob($select, $join, $where){  
-
  		$query = $select.''. $join.''.$where;
 
  		$result = mysql_query($query,$this->conexion);  
-  		if(!$result){  
-  			echo 'mySQL Error: ' . mysql_error();  
-  			exit;  
+  		if(!$result){   
+                        throw new Exception (sprintf ("MySQL.Error(%d): %s", mysql_errno (), mysql_error ()));
   		}  
   		return $result;   
   	}  
