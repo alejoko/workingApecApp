@@ -13,8 +13,8 @@ class MySoapClient extends SoapClient {
 	} 
 	function __myDoRequest($array, $method) { 
 		$request = $array;
-                $location = WSDL_METHODS; 
-                $action = $method;
+        $location = WSDL_METHODS; 
+        $action = $method;
 		$version = '1';
 		$result =$this->__doRequest($request, $location, $action, $version);
 		return $result;
